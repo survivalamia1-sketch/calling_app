@@ -43,6 +43,18 @@ import '../../features/settings/domain/usecases/get_settings.dart';
 import '../../features/settings/domain/usecases/reset_settings.dart';
 import '../../features/settings/domain/usecases/update_settings.dart';
 import '../../features/settings/presentation/bloc/settings_bloc.dart';
+import '../../features/profile/data/datasources/profile_remote_data_source.dart';
+import '../../features/profile/data/repositories/profile_repository_impl.dart';
+import '../../features/profile/domain/repositories/profile_repository.dart';
+import '../../features/profile/domain/usecases/change_password.dart';
+import '../../features/profile/domain/usecases/update_profile.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/support/data/datasources/support_remote_data_source.dart';
+import '../../features/support/data/repositories/support_repository_impl.dart';
+import '../../features/support/domain/repositories/support_repository.dart';
+import '../../features/support/domain/usecases/get_faqs.dart';
+import '../../features/support/domain/usecases/submit_bug_report.dart';
+import '../../features/support/presentation/bloc/support_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -253,12 +265,66 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  // ===========================
+  // Profile Feature
+  // ===========================
+
+  // Data sources
+  getIt.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(client: getIt()),
+  );
+
+  // Repository
+  getIt.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      remoteDataSource: getIt(),
+      networkInfo: getIt(),
+    ),
+  );
+
+  // Use cases
+  getIt.registerLazySingleton(() => UpdateProfile(getIt()));
+  getIt.registerLazySingleton(() => ChangePassword(getIt()));
+
+  // Bloc
+  getIt.registerFactory(
+    () => ProfileBloc(
+      updateProfile: getIt(),
+      changePassword: getIt(),
+    ),
+  );
+
+  // ===========================
+  // Support Feature
+  // ===========================
+
+  // Data sources
+  getIt.registerLazySingleton<SupportRemoteDataSource>(
+    () => SupportRemoteDataSourceImpl(client: getIt()),
+  );
+
+  // Repository
+  getIt.registerLazySingleton<SupportRepository>(
+    () => SupportRepositoryImpl(
+      remoteDataSource: getIt(),
+      networkInfo: getIt(),
+    ),
+  );
+
+  // Use cases
+  getIt.registerLazySingleton(() => GetFAQs(getIt()));
+  getIt.registerLazySingleton(() => SubmitBugReport(getIt()));
+
+  // Bloc
+  getIt.registerFactory(
+    () => SupportBloc(
+      getFAQs: getIt(),
+      submitBugReport: getIt(),
+    ),
+  );
+
   // Call Feature
   // - WebRTCService
   // - SignalingService
   // - CallBloc
-
-  // Profile Feature
-  // - ProfileRepository
-  // - ProfileBloc
 }
