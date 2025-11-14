@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { roomsAPI } from '@/lib/api';
 import { formatDate, getStatusColor } from '@/lib/utils';
+import { showSuccess, showError, getErrorMessage } from '@/lib/toast';
 import { Search, XCircle } from 'lucide-react';
 
 interface Room {
@@ -65,9 +66,9 @@ export default function RoomsPage() {
     try {
       await roomsAPI.forceEnd(roomId);
       fetchRooms();
-      alert('Meeting ended successfully');
+      showSuccess('Meeting ended successfully');
     } catch (error) {
-      alert('Failed to end meeting');
+      showError(getErrorMessage(error));
     }
   };
 

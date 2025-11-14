@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usersAPI } from '@/lib/api';
 import { formatDate, getStatusColor } from '@/lib/utils';
+import { showSuccess, showError, getErrorMessage } from '@/lib/toast';
 import { Search, UserCheck, UserX, Key, Eye } from 'lucide-react';
 
 interface User {
@@ -49,9 +50,9 @@ export default function UsersPage() {
     try {
       await usersAPI.activate(userId);
       fetchUsers();
-      alert('User activated successfully');
+      showSuccess('User activated successfully');
     } catch (error) {
-      alert('Failed to activate user');
+      showError(getErrorMessage(error));
     }
   };
 
@@ -60,9 +61,9 @@ export default function UsersPage() {
     try {
       await usersAPI.deactivate(userId);
       fetchUsers();
-      alert('User deactivated successfully');
+      showSuccess('User deactivated successfully');
     } catch (error) {
-      alert('Failed to deactivate user');
+      showError(getErrorMessage(error));
     }
   };
 
@@ -72,9 +73,9 @@ export default function UsersPage() {
 
     try {
       await usersAPI.resetPassword(userId, newPassword);
-      alert('Password reset successfully');
+      showSuccess('Password reset successfully');
     } catch (error) {
-      alert('Failed to reset password');
+      showError(getErrorMessage(error));
     }
   };
 

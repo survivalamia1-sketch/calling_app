@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { settingsAPI, authAPI } from '@/lib/api';
+import { showSuccess, showError, getErrorMessage } from '@/lib/toast';
 import { Save, Lock } from 'lucide-react';
 
 interface SystemSetting {
@@ -66,9 +67,9 @@ export default function SettingsPage() {
 
       await Promise.all(promises);
       await fetchSettings();
-      alert('Settings saved successfully');
+      showSuccess('Settings saved successfully');
     } catch (error) {
-      alert('Failed to save settings');
+      showError(getErrorMessage(error));
     } finally {
       setSaving(false);
     }
@@ -78,24 +79,24 @@ export default function SettingsPage() {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
-      alert('New passwords do not match');
+      showError('New passwords do not match');
       return;
     }
 
     if (newPassword.length < 8) {
-      alert('Password must be at least 8 characters long');
+      showError('Password must be at least 8 characters long');
       return;
     }
 
     setPasswordLoading(true);
     try {
       await authAPI.changePassword(oldPassword, newPassword);
-      alert('Password changed successfully');
+      showSuccess('Password changed successfully');
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
-    } catch (error: any) {
-      alert(error.response?.data?.error || 'Failed to change password');
+    } catch (error) {
+      showError(getErrorMessage(error));
     } finally {
       setPasswordLoading(false);
     }

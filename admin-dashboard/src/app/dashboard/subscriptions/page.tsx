@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { subscriptionsAPI } from '@/lib/api';
 import { formatDate, formatCurrency, getStatusColor, getPlanBadgeColor } from '@/lib/utils';
+import { showSuccess, showError, getErrorMessage } from '@/lib/toast';
 import { Search, TrendingUp, Calendar, XCircle } from 'lucide-react';
 
 interface Subscription {
@@ -53,32 +54,32 @@ export default function SubscriptionsPage() {
   const handleUpgrade = async (userId: string) => {
     const newPlan = prompt('Enter new plan type (free, pro, business):');
     if (!newPlan || !['free', 'pro', 'business'].includes(newPlan.toLowerCase())) {
-      alert('Invalid plan type');
+      showError('Invalid plan type');
       return;
     }
 
     try {
       await subscriptionsAPI.upgrade(userId, newPlan.toLowerCase());
       fetchSubscriptions();
-      alert('Subscription upgraded successfully');
+      showSuccess('Subscription upgraded successfully');
     } catch (error) {
-      alert('Failed to upgrade subscription');
+      showError(getErrorMessage(error));
     }
   };
 
   const handleExtend = async (subscriptionId: string) => {
     const days = prompt('Enter number of days to extend:');
     if (!days || isNaN(Number(days))) {
-      alert('Invalid number of days');
+      showError('Invalid number of days');
       return;
     }
 
     try {
       await subscriptionsAPI.extend(subscriptionId, Number(days));
       fetchSubscriptions();
-      alert('Subscription extended successfully');
+      showSuccess('Subscription extended successfully');
     } catch (error) {
-      alert('Failed to extend subscription');
+      showError(getErrorMessage(error));
     }
   };
 
@@ -88,9 +89,9 @@ export default function SubscriptionsPage() {
     try {
       await subscriptionsAPI.cancel(subscriptionId);
       fetchSubscriptions();
-      alert('Subscription cancelled successfully');
+      showSuccess('Subscription cancelled successfully');
     } catch (error) {
-      alert('Failed to cancel subscription');
+      showError(getErrorMessage(error));
     }
   };
 
