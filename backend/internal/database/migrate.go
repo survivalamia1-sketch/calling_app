@@ -17,6 +17,10 @@ func AutoMigrate() error {
 		&models.Subscription{},
 		&models.Room{},
 		&models.RoomParticipant{},
+		&models.Admin{},
+		&models.AuditLog{},
+		&models.Payment{},
+		&models.SystemSettings{},
 	)
 
 	if err != nil {
@@ -99,5 +103,44 @@ func SeedPlans() error {
 	}
 
 	log.Println("✅ Subscription plans seeded successfully")
+	return nil
+}
+
+// SeedDefaultAdmin creates a default admin if none exists
+func SeedDefaultAdmin() error {
+	db := database.GetDB()
+
+	// Check if any admin exists
+	var count int64
+	db.Model(&models.Admin{}).Count(&count)
+
+	if count > 0 {
+		log.Println("✅ Admin already exists, skipping seed")
+		return nil
+	}
+
+	// Create default admin
+	admin := models.Admin{
+		Email:     "admin@callingapp.com",
+		FirstName: "System",
+		LastName:  "Admin",
+		Role:      models.AdminRoleSuperAdmin,
+		IsActive:  true,
+	}
+
+	// Default password: "admin123" - CHANGE THIS IN PRODUCTION
+	if err := admin.HashPassword("admin123"); err != nil {
+		return err
+	}
+
+	if err := db.Create(&admin).Error; err != nil {
+		return err
+	}
+
+	log.Println("✅ Default admin created")
+	log.Println("⚠️  Email: admin@callingapp.com")
+	log.Println("⚠️  Password: admin123")
+	log.Println("⚠️  PLEASE CHANGE THE PASSWORD IMMEDIATELY!")
+
 	return nil
 }

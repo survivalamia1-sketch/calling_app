@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/yourusername/calling-app-backend/internal/admin"
 	"github.com/yourusername/calling-app-backend/internal/auth"
 	dbmigrate "github.com/yourusername/calling-app-backend/internal/database"
 	"github.com/yourusername/calling-app-backend/internal/middleware"
@@ -42,6 +43,11 @@ func main() {
 		log.Fatalf("Failed to seed plans: %v", err)
 	}
 
+	// Seed default admin
+	if err := dbmigrate.SeedDefaultAdmin(); err != nil {
+		log.Fatalf("Failed to seed default admin: %v", err)
+	}
+
 	// Initialize WebRTC hub
 	webrtcHub := webrtc.NewHub()
 	go webrtcHub.Run()
@@ -70,6 +76,7 @@ func main() {
 	authHandler := auth.NewHandler(cfg)
 	subsHandler := subscriptions.NewHandler(cfg)
 	roomsHandler := rooms.NewHandler()
+	adminHandler := admin.NewHandler(cfg)
 
 	// API routes
 	v1 := router.Group("/api/" + cfg.Server.APIVersion)
@@ -134,6 +141,62 @@ func main() {
 
 		// WebRTC signaling WebSocket
 		v1.GET("/ws", webrtc.HandleWebSocket(webrtcHub))
+
+		// ===== ADMIN ROUTES =====
+		adminRoutes := v1.Group("/admin")
+		{
+			// Admin auth (public)
+			adminRoutes.POST("/auth/login", adminHandler.Login)
+
+			// Protected admin routes (requires admin authentication)
+			adminProtected := adminRoutes.Group("")
+			adminProtected.Use(middleware.AdminAuthMiddleware(cfg))
+			adminProtected.Use(middleware.AuditLogMiddleware())
+			{
+				// Admin auth endpoints
+				adminProtected.GET("/auth/profile", adminHandler.GetProfile)
+				adminProtected.POST("/auth/change-password", adminHandler.ChangePassword)
+
+				// User management
+				adminProtected.GET("/users", adminHandler.GetAllUsers)
+				adminProtected.GET("/users/:id", adminHandler.GetUserDetails)
+				adminProtected.POST("/users/:id/activate", adminHandler.ActivateUser)
+				adminProtected.POST("/users/:id/deactivate", adminHandler.DeactivateUser)
+				adminProtected.POST("/users/:id/reset-password", adminHandler.ResetUserPassword)
+
+				// Subscription management
+				adminProtected.GET("/subscriptions", adminHandler.GetAllSubscriptions)
+				adminProtected.POST("/subscriptions/upgrade/:user_id", adminHandler.ManuallyUpgradeSubscription)
+				adminProtected.POST("/subscriptions/:id/extend", adminHandler.ExtendSubscription)
+				adminProtected.POST("/subscriptions/:id/cancel", adminHandler.CancelSubscription)
+
+				// Room/meeting management
+				adminProtected.GET("/rooms", adminHandler.GetAllRooms)
+				adminProtected.POST("/rooms/:id/end", adminHandler.ForceEndRoom)
+
+				// Analytics
+				adminProtected.GET("/analytics/dashboard", adminHandler.GetDashboardStats)
+				adminProtected.GET("/analytics/revenue", adminHandler.GetRevenueChart)
+				adminProtected.GET("/analytics/signups", adminHandler.GetSignupsChart)
+
+				// Payments
+				adminProtected.GET("/payments", adminHandler.GetAllPayments)
+
+				// System settings
+				adminProtected.GET("/settings", adminHandler.GetSystemSettings)
+				adminProtected.PUT("/settings", adminHandler.UpdateSystemSetting)
+
+				// Audit logs
+				adminProtected.GET("/audit-logs", adminHandler.GetAuditLogs)
+
+				// Super admin only routes
+				superAdminRoutes := adminProtected.Group("")
+				superAdminRoutes.Use(middleware.RequireSuperAdmin())
+				{
+					superAdminRoutes.POST("/admins", adminHandler.CreateAdmin)
+				}
+			}
+		}
 	}
 
 	// Start server
