@@ -1,240 +1,327 @@
-# Video Calling App
+# 🎥 Video Calling SaaS Platform
 
-A full-featured video calling application similar to Zoom, built with React, TypeScript, WebRTC, and Socket.io.
+A complete, production-ready video calling platform with subscription management, built with modern technologies.
 
-## Features
+## 🌟 Features
 
-- 📹 **HD Video Calling** - High-quality peer-to-peer video calls
-- 🎤 **Crystal Clear Audio** - Real-time audio communication
-- 🖥️ **Screen Sharing** - Share your screen with participants
-- 💬 **Live Chat** - Text messaging during calls
-- 👥 **Multi-participant Support** - Support for multiple users in a room
-- 🎨 **Modern UI** - Clean and intuitive user interface
-- 📱 **Responsive Design** - Works on desktop and mobile devices
-- 🔒 **Secure** - WebRTC encrypted peer-to-peer connections
+### ✅ Complete Authentication System
+- User registration with email verification
+- Secure login with JWT tokens
+- Password reset functionality
+- Email verification workflows
 
-## Tech Stack
+### 📞 Video Calling (WebRTC)
+- Real-time video and audio communication
+- WebSocket signaling server
+- Support for multiple participants
+- Screen sharing capability
+- Meeting rooms with unique codes
 
-### Frontend
-- React 18 with TypeScript
-- WebRTC for video/audio streaming
-- Socket.io Client for real-time signaling
-- React Router for navigation
-- CSS3 for styling
+### 💼 Subscription Management
+- Multiple subscription plans (Free, Pro, Enterprise)
+- Stripe payment integration
+- Subscription upgrade/downgrade
+- Billing history
+- Webhook handling for payment events
 
-### Backend
-- Node.js with Express
-- Socket.io for WebSocket connections
-- UUID for room ID generation
+### 📅 Meeting Management
+- Create instant or scheduled meetings
+- Join meetings by code
+- Meeting history
+- Participant management
+- Waiting room feature
 
-## Prerequisites
+### 👥 Admin Dashboard
+- User management
+- Subscription overview
+- Meeting analytics
+- System monitoring
+- Revenue tracking
 
-- Node.js (v14 or higher)
-- npm or yarn
-- Modern web browser with WebRTC support (Chrome, Firefox, Safari, Edge)
+### 📱 Cross-Platform Support
+- **Flutter Mobile App**: Android & iOS
+- **Flutter Web App**: Progressive Web App
+- **Flutter Desktop**: Windows, macOS, Linux
+- **Admin Dashboard**: Next.js web application
 
-## Installation
-
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd calling_app
-```
-
-2. Install dependencies for both server and client:
-```bash
-npm run install-all
-```
-
-Or manually:
-```bash
-# Install server dependencies
-npm install
-
-# Install client dependencies
-cd client
-npm install
-cd ..
-```
-
-## Running the Application
-
-### Development Mode
-
-Run both server and client concurrently:
-```bash
-npm run dev
-```
-
-Or run them separately:
-
-**Terminal 1 - Start the server:**
-```bash
-npm run server
-```
-
-**Terminal 2 - Start the client:**
-```bash
-npm run client
-```
-
-The server will run on `http://localhost:5000` and the client on `http://localhost:3000`.
-
-### Production Build
-
-Build the client for production:
-```bash
-npm run build
-```
-
-This creates an optimized production build in the `client/build` directory.
-
-## Usage
-
-1. **Create a Meeting**
-   - Enter your name on the home page
-   - Click "Create New Meeting"
-   - Share the Room ID with participants
-
-2. **Join a Meeting**
-   - Enter your name
-   - Enter the Room ID you received
-   - Click "Join Meeting"
-
-3. **During the Meeting**
-   - Toggle video: Click the video button
-   - Toggle audio: Click the microphone button
-   - Share screen: Click the screen share button
-   - Open chat: Click the chat button
-   - Leave meeting: Click the leave button
-
-## Project Structure
+## 🏗️ Architecture
 
 ```
 calling_app/
-├── server/
-│   └── index.js              # Express + Socket.io server
-├── client/
-│   ├── public/
-│   │   └── index.html        # HTML template
+├── backend/              # Go API server
+│   ├── api/             # HTTP handlers
+│   ├── internal/        # Business logic
+│   ├── models/          # Database models
+│   └── migrations/      # SQL migrations
+│
+├── flutter_app/         # Flutter client (all platforms)
+│   ├── lib/
+│   │   ├── core/       # Core utilities, DI, router
+│   │   └── features/   # Feature modules
+│   │       ├── auth/
+│   │       ├── home/
+│   │       ├── meetings/
+│   │       ├── subscriptions/
+│   │       ├── profile/
+│   │       ├── settings/
+│   │       └── support/
+│   │
+├── admin-dashboard/     # Next.js admin panel
 │   ├── src/
-│   │   ├── components/       # React components
-│   │   │   ├── Chat.tsx
-│   │   │   ├── Controls.tsx
-│   │   │   └── VideoGrid.tsx
-│   │   ├── pages/           # Page components
-│   │   │   ├── Home.tsx
-│   │   │   └── Room.tsx
-│   │   ├── services/        # Services
-│   │   │   ├── socket.ts
-│   │   │   └── webrtc.ts
-│   │   ├── App.tsx
-│   │   └── index.tsx
-│   └── package.json
-├── package.json
-└── README.md
+│   │   ├── app/
+│   │   ├── components/
+│   │   └── lib/
+│   │
+└── docker-compose.yml   # Production deployment
 ```
 
-## Configuration
+## 🛠️ Tech Stack
 
-### Environment Variables
+### Backend (Go)
+- **Framework**: Gin
+- **Database**: PostgreSQL with GORM
+- **Cache**: Redis
+- **Auth**: JWT
+- **Payments**: Stripe
+- **Email**: SMTP
+- **WebSocket**: Gorilla WebSocket
+- **Real-time**: Custom signaling server
 
-Create a `.env` file in the root directory for server configuration:
+### Frontend (Flutter)
+- **Architecture**: Clean Architecture
+- **State Management**: flutter_bloc
+- **Navigation**: go_router
+- **DI**: GetIt
+- **API**: Dio
+- **WebRTC**: flutter_webrtc
+- **Payments**: Stripe SDK
+- **Local Storage**: FlutterSecureStorage
 
-```env
-PORT=5000
-CLIENT_URL=http://localhost:3000
+### Admin (Next.js)
+- **Framework**: Next.js 14
+- **UI**: Tailwind CSS + shadcn/ui
+- **Charts**: Recharts
+- **API**: Fetch API
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Docker & Docker Compose
+- Flutter SDK (for mobile development)
+- Node.js 18+ (for admin dashboard development)
+- Go 1.21+ (for backend development)
+
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+cd calling_app
 ```
 
-Create a `.env` file in the `client` directory for client configuration:
-
-```env
-REACT_APP_SERVER_URL=http://localhost:5000
+### 2. Configure Environment
+```bash
+cp .env.example .env
+# Edit .env with your configurations
 ```
 
-## Features in Detail
+### 3. Start with Docker
+```bash
+# Start all services
+docker-compose up -d
 
-### WebRTC Peer-to-Peer Communication
-- Establishes direct peer-to-peer connections between users
-- Uses STUN servers for NAT traversal
-- Supports multiple simultaneous connections
+# Check status
+docker-compose ps
 
-### Socket.io Signaling
-- Handles WebRTC signaling (offer/answer/ICE candidates)
-- Manages room creation and participant tracking
-- Real-time event notifications
+# View logs
+docker-compose logs -f
+```
 
-### Video Controls
-- Toggle camera on/off
-- Toggle microphone on/off
-- Visual indicators for muted participants
+### 4. Access Applications
+- **Backend API**: http://localhost:8080
+- **Admin Dashboard**: http://localhost:3001
+- **API Docs**: http://localhost:8080/swagger
 
-### Screen Sharing
-- Share your entire screen or specific windows
-- Automatic stop when sharing ends
-- Real-time notifications to participants
+## 📱 Flutter App Setup
 
-### Chat System
-- Real-time text messaging
-- Timestamps on messages
-- Scrollable message history
-- User identification
+### Development
 
-## Browser Compatibility
+```bash
+cd flutter_app
 
-- Chrome/Chromium (Recommended)
-- Firefox
-- Safari (14+)
-- Edge (Chromium-based)
+# Install dependencies
+flutter pub get
 
-## Known Limitations
+# Run code generation
+flutter pub run build_runner build --delete-conflicting-outputs
 
-- Requires HTTPS in production for camera/microphone access
-- Screen sharing may require additional permissions
-- Maximum recommended participants: 4-6 for optimal performance
-- TURN server may be needed for some network configurations
+# Run on device
+flutter run --dart-define=API_BASE_URL=http://localhost:8080/api/v1
+```
 
-## Troubleshooting
+### Build for Production
 
-### Camera/Microphone Access Denied
-- Check browser permissions
-- Ensure you're using HTTPS (required for production)
-- Try a different browser
+**Android:**
+```bash
+flutter build apk --release \
+  --dart-define=API_BASE_URL=https://api.yourdomain.com/api/v1
+```
 
-### Cannot Connect to Room
-- Check if the server is running
-- Verify the server URL in environment variables
-- Check firewall settings
+**iOS:**
+```bash
+flutter build ios --release \
+  --dart-define=API_BASE_URL=https://api.yourdomain.com/api/v1
+```
 
-### Poor Video Quality
-- Check your internet connection
-- Reduce number of participants
-- Lower video resolution in browser settings
+**Web:**
+```bash
+flutter build web --release \
+  --dart-define=API_BASE_URL=https://api.yourdomain.com/api/v1
+```
 
-## Future Enhancements
+## 🔧 Development
+
+### Backend Development
+```bash
+cd backend
+
+# Install dependencies
+go mod download
+
+# Run migrations
+go run cmd/server/main.go migrate
+
+# Start server
+go run cmd/server/main.go
+```
+
+### Admin Dashboard Development
+```bash
+cd admin-dashboard
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+## 🐳 Production Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for comprehensive deployment instructions.
+
+**Quick Deploy:**
+```bash
+# Configure production environment
+cp .env.example .env
+nano .env  # Set production values
+
+# Build and start all services
+docker-compose up -d --build
+
+# Check status
+docker-compose ps
+```
+
+## 📚 API Documentation
+
+### Authentication Endpoints
+- `POST /api/v1/auth/register` - Register new user
+- `POST /api/v1/auth/login` - Login
+- `POST /api/v1/auth/verify` - Verify email
+- `POST /api/v1/auth/forgot-password` - Request password reset
+- `POST /api/v1/auth/reset-password` - Reset password
+- `GET /api/v1/auth/me` - Get current user
+
+### Meetings Endpoints
+- `GET /api/v1/rooms` - List meetings
+- `POST /api/v1/rooms` - Create meeting
+- `GET /api/v1/rooms/:id` - Get meeting details
+- `PUT /api/v1/rooms/:id` - Update meeting
+- `DELETE /api/v1/rooms/:id` - Delete meeting
+- `POST /api/v1/rooms/join` - Join meeting
+
+### Subscriptions Endpoints
+- `GET /api/v1/subscriptions/plans` - List plans
+- `GET /api/v1/subscriptions/me` - Get current subscription
+- `POST /api/v1/subscriptions/checkout` - Create checkout session
+- `POST /api/v1/subscriptions/cancel` - Cancel subscription
+
+### WebSocket
+- `WS /ws?room_id=<room_id>` - Connect to signaling server
+
+## 🔐 Security Features
+
+- ✅ JWT authentication
+- ✅ Password hashing with bcrypt
+- ✅ Email verification required
+- ✅ Rate limiting
+- ✅ CORS protection
+- ✅ SQL injection prevention (GORM)
+- ✅ XSS protection headers
+- ✅ Secure password reset tokens
+- ✅ HTTPS/TLS support
+- ✅ Webhook signature verification
+
+## 📊 Database Schema
+
+### Users
+- id, email, password_hash, first_name, last_name
+- is_verified, is_active, email_verified_at
+- plan_type, created_at, updated_at
+
+### Rooms (Meetings)
+- id, title, description, room_code, host_id
+- scheduled_at, duration, max_participants
+- is_active, requires_approval
+- created_at, started_at, ended_at
+
+### Subscriptions
+- id, user_id, plan_id, stripe_customer_id, stripe_subscription_id
+- status, billing_cycle
+- current_period_start, current_period_end
+- cancel_at_period_end, canceled_at
+
+### Subscription Plans
+- id, name, description, priority
+- monthly_price, yearly_price
+- max_participants, max_meeting_duration
+- features (JSON), created_at
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+[Your License Here]
+
+## 🔗 Links
+
+- [Backend Documentation](./backend/README.md)
+- [Flutter App Documentation](./flutter_app/README.md)
+- [Admin Dashboard Documentation](./admin-dashboard/README.md)
+- [Deployment Guide](./DEPLOYMENT.md)
+
+## 💡 Roadmap
 
 - [ ] Recording functionality
+- [ ] AI transcription
 - [ ] Virtual backgrounds
-- [ ] Hand raise feature
-- [ ] Waiting room
-- [ ] User authentication
-- [ ] Persistent rooms
-- [ ] File sharing
 - [ ] Breakout rooms
-- [ ] Grid/speaker view toggle
+- [ ] Polls and Q&A
+- [ ] Calendar integrations
+- [ ] Mobile notifications
+- [ ] Analytics dashboard enhancements
 
-## Contributing
+## 📞 Support
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License - feel free to use this project for personal or commercial purposes.
-
-## Support
-
-For issues and questions, please open an issue on the GitHub repository.
+- 📧 Email: support@yourdomain.com
+- 📖 Documentation: `/docs`
+- 🐛 Issues: GitHub Issues
 
 ---
 
-Built with ❤️ using React, WebRTC, and Socket.io
+**Built with ❤️ using modern technologies**
