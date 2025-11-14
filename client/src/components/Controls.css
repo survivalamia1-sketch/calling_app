@@ -1,0 +1,86 @@
+.controls-container {
+  padding: 20px;
+  background-color: #111;
+  border-top: 1px solid #333;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.control-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 20px;
+  background-color: #374151;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 80px;
+}
+
+.control-btn:hover {
+  background-color: #4b5563;
+  transform: translateY(-2px);
+}
+
+.control-btn.disabled {
+  background-color: #dc2626;
+}
+
+.control-btn.disabled:hover {
+  background-color: #ef4444;
+}
+
+.control-btn.active {
+  background-color: #4F46E5;
+}
+
+.control-btn.active:hover {
+  background-color: #6366f1;
+}
+
+.control-btn.leave-btn {
+  background-color: #dc2626;
+}
+
+.control-btn.leave-btn:hover {
+  background-color: #ef4444;
+}
+
+.control-btn .icon {
+  font-size: 1.5rem;
+}
+
+.control-btn .label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .controls {
+    gap: 8px;
+  }
+
+  .control-btn {
+    min-width: 60px;
+    padding: 10px 12px;
+  }
+
+  .control-btn .icon {
+    font-size: 1.2rem;
+  }
+
+  .control-btn .label {
+    font-size: 0.65rem;
+  }
+}
