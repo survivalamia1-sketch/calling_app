@@ -1,421 +1,358 @@
-# Calling App - Flutter Client
+# Flutter Video Calling App - Clean Architecture
 
-Complete Flutter application for the video calling SaaS platform with subscriptions, meeting management, and WebRTC integration.
+A cross-platform video calling application built with Flutter, following Clean Architecture principles and feature-first organization.
 
-## Features
+## 🏗️ Architecture
 
-### 🔐 Authentication
-- **Sign In / Sign Up**: Secure email and password authentication
-- **Email Verification**: Required email verification flow
-- **Password Reset**: Forgot password functionality
-- **JWT Token Management**: Automatic token refresh and secure storage
-
-### 🏠 Home Dashboard
-- **Quick Actions**: Start meeting, schedule, join with code
-- **Upcoming Meetings**: View next 5 scheduled meetings
-- **Plan Status**: Current subscription plan display
-- **User Greeting**: Personalized welcome message
-
-### 📅 Meeting Management
-- **Create Meetings**: Instant or scheduled meetings
-- **Join with Code**: Simple meeting code entry
-- **Meeting List**: Upcoming and past meetings with tabs
-- **Meeting Options**:
-  - Password protection
-  - Max participants control
-  - Scheduled date/time selection
-- **Meeting Actions**: Join, copy code, delete
-
-### 💎 Subscription & Billing
-- **Plans**: Free, Pro, Business tiers
-- **Billing Cycles**: Monthly or yearly options
-- **Feature Comparison**: Clear feature lists for each plan
-- **Stripe Integration**: Secure payment processing
-- **Plan Management**: Upgrade, downgrade, cancel
-
-### 📞 Video Calling
-- **WebRTC Integration**: Real-time video and audio
-- **Local Video**: Camera preview and control
-- **Remote Participants**: Grid layout for multiple users
-- **Call Controls**:
-  - Mute/unmute microphone
-  - Enable/disable video
-  - Screen sharing
-  - End call
-- **Call Timer**: Duration tracking
-
-### 👤 Profile & Settings
-- **Profile Management**: Update name and avatar
-- **Password Change**: Secure password update
-- **Account Info**: Plan, status, member since
-- **Meeting Preferences**: Auto-mute, camera defaults
-- **Notifications**: Email notification settings
-
-### 🆘 Help & Support
-- **FAQ**: Common questions and answers
-- **Contact Support**: Email support access
-
-## Tech Stack
-
-- **Framework**: Flutter 3.0+
-- **State Management**: Provider
-- **Navigation**: go_router
-- **HTTP Client**: http, dio
-- **WebRTC**: flutter_webrtc
-- **Payments**: flutter_stripe
-- **Local Storage**: flutter_secure_storage, shared_preferences
-- **UI Components**: Material Design 3
-
-## Project Structure
+This project follows **Clean Architecture** with a **Feature-first** organization pattern:
 
 ```
 lib/
-├── config/
-│   ├── app_config.dart         # App configuration
-│   └── theme.dart              # Theme configuration
-├── models/
-│   ├── user.dart               # User model
-│   ├── subscription.dart       # Subscription & plan models
-│   └── meeting.dart            # Meeting & participant models
-├── providers/
-│   ├── auth_provider.dart      # Authentication state
-│   ├── subscription_provider.dart  # Subscription state
-│   ├── meeting_provider.dart   # Meeting state
-│   └── call_provider.dart      # Call state with WebRTC
-├── services/
-│   ├── api_service.dart        # REST API client
-│   └── auth_service.dart       # Token management
-├── routes/
-│   └── app_router.dart         # Navigation configuration
-├── screens/
-│   ├── onboarding/
-│   │   └── welcome_screen.dart
-│   ├── auth/
-│   │   ├── sign_in_screen.dart
-│   │   ├── sign_up_screen.dart
-│   │   ├── email_verification_screen.dart
-│   │   └── forgot_password_screen.dart
-│   ├── home/
-│   │   └── home_screen.dart
-│   ├── meetings/
-│   │   ├── meetings_list_screen.dart
-│   │   ├── create_meeting_screen.dart
-│   │   └── join_meeting_screen.dart
-│   ├── call/
-│   │   └── call_screen.dart
-│   ├── subscription/
-│   │   ├── plans_screen.dart
-│   │   └── billing_screen.dart
-│   ├── profile/
-│   │   ├── profile_screen.dart
-│   │   └── settings_screen.dart
-│   └── support/
-│       └── help_screen.dart
-├── widgets/
-│   └── loading_button.dart     # Reusable widgets
-└── main.dart                   # App entry point
+├── core/
+│   ├── constants/      # API endpoints, app constants
+│   ├── di/             # Dependency injection (GetIt)
+│   ├── error/          # Failures and exceptions
+│   ├── network/        # Network connectivity checker
+│   ├── router/         # Go Router configuration
+│   ├── usecases/       # Base UseCase class
+│   └── utils/          # Extensions and utilities
+│
+└── features/
+    ├── auth/           # ✅ Authentication (COMPLETE)
+    ├── home/           # ✅ Dashboard (COMPLETE)
+    ├── meetings/       # ✅ Meetings Management (COMPLETE)
+    ├── shell/          # ✅ Navigation Shell (COMPLETE)
+    ├── call/           # ⏳ Video Calling (TODO)
+    ├── subscriptions/  # ⏳ Subscription Plans (TODO)
+    ├── profile/        # ⏳ User Profile (TODO)
+    ├── settings/       # ⏳ App Settings (TODO)
+    └── support/        # ⏳ Help & Support (TODO)
 ```
 
-## Prerequisites
+Each feature follows the Clean Architecture layers:
+- **Domain**: Entities, Repository Interfaces, Use Cases
+- **Data**: Models, Data Sources, Repository Implementations
+- **Presentation**: Blocs, Pages, Widgets
 
-- Flutter SDK 3.0 or higher
-- Dart SDK 3.0 or higher
-- Go backend running (see `/backend` directory)
-- Stripe account for payments
+## ✅ Implemented Features
 
-## Installation
+### 1. Auth Feature (Complete)
+**Domain Layer:**
+- `User` entity with business logic
+- `AuthRepository` interface
+- Use cases: `Login`, `Register`, `Logout`, `GetCurrentUser`
 
-1. **Clone the repository:**
-   ```bash
-   cd flutter_app
-   ```
+**Data Layer:**
+- `UserModel` with JSON serialization
+- `AuthRemoteDataSource` - API integration with Dio
+- `AuthLocalDataSource` - Secure token/user caching with FlutterSecureStorage
+- `AuthRepositoryImpl` - Repository implementation with error handling
 
-2. **Install dependencies:**
-   ```bash
-   flutter pub get
-   ```
+**Presentation Layer:**
+- `AuthBloc` with Freezed events and states
+- Pages:
+  - ✅ Onboarding (4-page intro slider)
+  - ✅ Sign In (email/password authentication)
+  - ✅ Sign Up (registration with validation)
+  - ✅ Email Verification (resend verification email)
+  - ✅ Forgot Password (password reset flow)
+- Custom widgets: `CustomButton`, `CustomTextField`, `SignInForm`, `SignUpForm`
 
-3. **Configure environment:**
-   ```bash
-   cp .env.example .env
-   ```
+### 2. Home Feature (Complete)
+**Presentation Layer:**
+- `HomeDashboardPage` with responsive layout
+- Statistics cards (Total Meetings, Upcoming, Hours, Participants)
+- Quick action cards (Start Meeting, Schedule, Join, Share Screen)
+- Upcoming meetings list with mock data
+- Adaptive UI for mobile, tablet, and desktop
 
-   Edit `.env`:
-   ```env
-   API_BASE_URL=http://your-api-url/api/v1
-   WS_URL=ws://your-api-url/ws
-   STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-   ```
+### 3. Meetings Feature (Complete)
+**Domain Layer:**
+- `Meeting` entity with status logic (scheduled, ongoing, completed)
+- `MeetingsRepository` interface
+- Use cases: `GetMeetings`, `CreateMeeting`, `JoinMeeting`
+
+**Data Layer:**
+- `MeetingModel` with JSON serialization
+- `MeetingsRemoteDataSource` - Complete CRUD operations
+- `MeetingsRepositoryImpl` with error handling
+
+**Presentation Layer:**
+- `MeetingsBloc` with Freezed events and states
+- `MeetingsListPage` with pull-to-refresh
+- `MeetingCard` widget with status indicators and responsive design
+
+### 4. Shell Feature (Complete)
+**Presentation Layer:**
+- `MainShellPage` - Adaptive navigation container
+- Bottom navigation bar for mobile (width < 640px)
+- Navigation rail for tablet (640px ≤ width < 1024px)
+- Extended navigation rail for desktop (width ≥ 1024px)
+- Integrated with go_router ShellRoute
+
+## 🛠️ Tech Stack
+
+### State Management & Architecture
+- `flutter_bloc` (^8.1.3) - Business Logic Component pattern
+- `bloc` (^8.1.2) - Core BLoC library
+- `equatable` (^2.0.5) - Value equality
+
+### Functional Programming & Error Handling
+- `dartz` (^0.10.1) - Either<Failure, Success> pattern
+
+### Code Generation
+- `freezed` (^2.4.5) - Immutable classes and union types
+- `freezed_annotation` (^2.4.1)
+- `json_serializable` (^6.7.1) - JSON serialization
+- `json_annotation` (^4.8.1)
+- `build_runner` (^2.4.7)
+
+### Dependency Injection
+- `get_it` (^7.6.4) - Service locator
+- `injectable` (^2.3.2) - Code generation for DI
+
+### Networking & Storage
+- `dio` (^5.4.0) - HTTP client
+- `flutter_secure_storage` (^9.0.0) - Secure token storage
+- `internet_connection_checker` (^1.0.0+1) - Network connectivity
+
+### Navigation
+- `go_router` (^13.0.0) - Declarative routing with deep linking
+
+### UI & Utilities
+- `intl` (^0.18.1) - Internationalization and date formatting
+
+### Testing
+- `bloc_test` (^9.1.5)
+- `mockito` (^5.4.4)
+- `mocktail` (^1.0.2)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Flutter SDK (3.0.0 or higher)
+- Dart SDK (3.0.0 or higher)
+
+### Installation
+
+1. **Install dependencies:**
+```bash
+cd flutter_app
+flutter pub get
+```
+
+2. **Run code generation:**
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+This will generate:
+- Freezed files (`.freezed.dart`) for blocs
+- JSON serialization files (`.g.dart`) for models
+
+3. **Configure API endpoint:**
+
+Edit `lib/core/constants/api_constants.dart` or set environment variable:
+```bash
+flutter run --dart-define=API_BASE_URL=http://your-backend-url:8080/api/v1
+```
 
 4. **Run the app:**
+```bash
+# Development
+flutter run
+
+# Web
+flutter run -d chrome
+
+# Release build
+flutter build apk --release
+```
+
+## 📱 Supported Platforms
+
+- ✅ Android
+- ✅ iOS
+- ✅ Web
+- ✅ Windows
+- ✅ macOS
+- ✅ Linux
+
+## 🎨 UI/UX Features
+
+### Responsive Design
+- **Mobile** (< 640px): Bottom navigation, vertical layouts
+- **Tablet** (640-1024px): Navigation rail, 2-column grids
+- **Desktop** (≥ 1024px): Extended navigation rail, multi-column grids
+
+### Theme Support
+- Material 3 design system
+- Light and dark mode support (follows system preference)
+- Consistent color scheme and typography
+
+## 📋 Next Steps
+
+### Priority 1: Core Features
+
+1. **Run Code Generation** (Required before running the app)
    ```bash
-   flutter run
+   flutter pub run build_runner build --delete-conflicting-outputs
    ```
 
-## Building
+2. **Create Meeting Page**
+   - Form to create/schedule meetings
+   - Date/time picker
+   - Meeting settings (max participants, approval, duration)
 
-### Android
-```bash
-flutter build apk --release
-# or
-flutter build appbundle --release
-```
+3. **Meeting Details Page**
+   - View meeting information
+   - Edit meeting (if host)
+   - Copy meeting link
+   - Share meeting code
 
-### iOS
-```bash
-flutter build ios --release
-```
+4. **Join Meeting Flow**
+   - Join by code dialog
+   - Waiting room (if approval required)
+   - Pre-call device check (camera, microphone)
 
-### Web
-```bash
-flutter build web --release
-```
+### Priority 2: Video Calling
 
-## Configuration
+5. **Call Feature - WebRTC Integration**
+   - Domain: `CallRepository`, use cases
+   - Data: WebRTC service, signaling service (WebSocket)
+   - Presentation: `CallBloc`, `CallPage`
+   - UI: Video grid, controls, participant list, chat
 
-### API Configuration
-Update `lib/config/app_config.dart` with your backend URL:
+6. **Call Controls**
+   - Mute/unmute microphone
+   - Enable/disable camera
+   - Screen sharing
+   - End call
+   - Participant management (host)
+
+### Priority 3: Monetization & User Management
+
+7. **Subscriptions Feature**
+   - View available plans (Free, Pro, Enterprise)
+   - Upgrade/downgrade subscription
+   - Billing history
+   - Payment integration (Stripe/PayPal)
+
+8. **Profile Feature**
+   - View/edit user profile
+   - Change password
+   - Upload profile picture
+   - Account settings
+
+9. **Settings Feature**
+   - App preferences (theme, language)
+   - Media settings (camera, microphone selection)
+   - Notifications
+   - Privacy settings
+
+### Priority 4: Support & Polish
+
+10. **Support Feature**
+    - Help center
+    - FAQ
+    - Contact support
+    - Report issues
+
+11. **Testing**
+    - Unit tests for use cases
+    - Widget tests for pages
+    - Bloc tests for all blocs
+    - Integration tests
+
+12. **Performance Optimization**
+    - Lazy loading for lists
+    - Image caching
+    - Code splitting
+
+## 🏛️ Architecture Patterns
+
+### Error Handling
+All repository methods return `Either<Failure, SuccessType>`:
 ```dart
-static const String apiBaseUrl = 'https://your-api.com/api/v1';
-static const String wsUrl = 'wss://your-api.com/ws';
+final result = await repository.login(email: email, password: password);
+result.fold(
+  (failure) => emit(AuthState.error(failure)),
+  (user) => emit(AuthState.authenticated(user)),
+);
 ```
 
-### Stripe Configuration
-Set your Stripe publishable key in `lib/main.dart`:
+### State Management
+Using BLoC pattern with Freezed:
 ```dart
-Stripe.publishableKey = 'your_stripe_publishable_key';
+// Events
+@freezed
+class AuthEvent with _$AuthEvent {
+  const factory AuthEvent.signInRequested({
+    required String email,
+    required String password,
+  }) = _SignInRequested;
+}
+
+// States
+@freezed
+class AuthState with _$AuthState {
+  const factory AuthState.authenticated(User user) = _Authenticated;
+  const factory AuthState.error(Failure failure) = _Error;
+}
 ```
 
-### Theme Customization
-Modify `lib/config/theme.dart` to customize colors and styles:
+### Dependency Injection
+Using GetIt with manual registration:
 ```dart
-static const Color primaryColor = Color(0xFF0284C7);
+// Register
+getIt.registerLazySingleton<AuthRepository>(
+  () => AuthRepositoryImpl(
+    remoteDataSource: getIt(),
+    localDataSource: getIt(),
+    networkInfo: getIt(),
+  ),
+);
+
+// Use
+final authBloc = getIt<AuthBloc>();
 ```
 
-## Features by Screen
+## 📚 Documentation
 
-### Welcome Screen (`/welcome`)
-- App logo and tagline
-- Feature highlights
-- Sign In / Create Account buttons
+- **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Comprehensive guide with code examples for implementing features
+- **[CLEAN_ARCHITECTURE.md](./CLEAN_ARCHITECTURE.md)** - Clean Architecture principles and patterns
 
-### Sign In Screen (`/auth/sign-in`)
-- Email and password fields
-- Remember me checkbox
-- Forgot password link
-- Create account link
+## 🤝 Contributing
 
-### Sign Up Screen (`/auth/sign-up`)
-- Name fields (first, last)
-- Email and password
-- Password confirmation
-- Terms acceptance
-- Email verification redirect
+When adding new features, follow the established patterns:
 
-### Home Screen (`/home`)
-- User greeting
-- Current plan card
-- Quick action buttons
-- Upcoming meetings list
-- Pull to refresh
+1. Create feature folder structure (domain, data, presentation)
+2. Define entities and repository interface in domain layer
+3. Implement models, data sources, and repository in data layer
+4. Create bloc with Freezed events/states in presentation layer
+5. Build UI pages and widgets
+6. Register dependencies in `lib/core/di/injection.dart`
+7. Add routes in `lib/core/router/app_router.dart`
+8. Run code generation
+9. Write tests
 
-### Create Meeting Screen (`/meetings/create`)
-- Meeting title input
-- Instant or scheduled toggle
-- Date/time picker
-- Max participants slider
-- Password protection
-- Meeting code generation
-- Share options
+## 📄 License
 
-### Join Meeting Screen (`/meetings/join`)
-- Meeting code input
-- Password field (if required)
-- QR code scanner option
-- Error handling
+[Add your license here]
 
-### Meetings List Screen (`/meetings`)
-- Tabs: Upcoming / Past
-- Meeting cards with details
-- Join, copy code, delete actions
-- Empty state with CTA
-- Pull to refresh
+## 🔗 Backend Integration
 
-### Call Screen (`/call/:meetingId`)
-- Local video preview
-- Remote participant grid
-- Call timer
-- Control buttons:
-  - Mute/Unmute
-  - Video On/Off
-  - Screen Share
-  - End Call
-- Participant list (planned)
-- Chat panel (planned)
+This app integrates with the Go backend server. API endpoints are defined in:
+- `lib/core/constants/api_constants.dart`
 
-### Plans Screen (`/subscription/plans`)
-- Monthly/Yearly toggle
-- Plan comparison cards
-- Feature lists
-- Current plan indicator
-- Stripe checkout integration
+Make sure the backend server is running and accessible at the configured `API_BASE_URL`.
 
-### Profile Screen (`/profile`)
-- Avatar display
-- Name editing
-- Email (read-only)
-- Change password dialog
-- Account information
-- Logout button
+## 🐛 Known Issues
 
-### Settings Screen (`/settings`)
-- Meeting preferences
-- Notification settings
-- App version
+1. Code generation files (.freezed.dart, .g.dart) need to be generated after pulling the code
+2. Some pages are placeholders (Subscriptions, Settings, Profile, Support, Call)
+3. Mock data is used in Home dashboard (will be replaced with real API calls)
 
-### Help Screen (`/help`)
-- FAQ accordion
-- Contact support
+## 📞 Support
 
-## State Management
-
-The app uses Provider for state management with these providers:
-
-- **AuthProvider**: User authentication and profile
-- **SubscriptionProvider**: Plans and billing
-- **MeetingProvider**: Meeting CRUD operations
-- **CallProvider**: WebRTC state and controls
-
-## API Integration
-
-All API calls are centralized in `lib/services/api_service.dart`:
-
-```dart
-final apiService = ApiService();
-
-// Authentication
-await apiService.login(email, password);
-await apiService.register(email, password, firstName, lastName);
-
-// Meetings
-await apiService.createMeeting(name: 'My Meeting');
-await apiService.getMyMeetings(status: 'upcoming');
-
-// Subscriptions
-await apiService.getPlans();
-await apiService.createCheckoutSession('pro', 'monthly');
-```
-
-## WebRTC Integration
-
-WebRTC functionality is handled by `CallProvider`:
-
-```dart
-final callProvider = Provider.of<CallProvider>(context);
-
-// Initialize
-await callProvider.initializeLocalRenderer();
-await callProvider.startLocalStream();
-
-// Controls
-callProvider.toggleMute();
-callProvider.toggleVideo();
-callProvider.toggleScreenShare();
-
-// Cleanup
-await callProvider.endCall();
-```
-
-## Error Handling
-
-Errors are displayed using:
-- SnackBar for temporary messages
-- AlertDialog for critical errors
-- Loading states for async operations
-- Empty states for no data
-
-## Testing
-
-```bash
-# Run unit tests
-flutter test
-
-# Run widget tests
-flutter test test/widget_test.dart
-
-# Run integration tests
-flutter drive --target=test_driver/app.dart
-```
-
-## Permissions
-
-### Android (`android/app/src/main/AndroidManifest.xml`)
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-permission android:name="android.permission.RECORD_AUDIO" />
-<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-```
-
-### iOS (`ios/Runner/Info.plist`)
-```xml
-<key>NSCameraUsageDescription</key>
-<string>Camera access required for video calls</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>Microphone access required for audio calls</string>
-```
-
-## Deep Linking
-
-The app supports deep links for joining meetings:
-
-```
-callingapp://join/MEETING_CODE
-```
-
-## Known Issues
-
-- QR code scanning not yet implemented
-- WebSocket signaling needs backend integration
-- Recording feature UI placeholder
-- Participant list in call screen planned
-
-## Next Steps
-
-1. **Complete WebRTC Integration**:
-   - Connect to WebSocket signaling server
-   - Handle peer connections
-   - Implement room synchronization
-
-2. **Enhanced Features**:
-   - QR code generation and scanning
-   - In-call chat
-   - Participant management
-   - Recording start/stop
-
-3. **Performance Optimizations**:
-   - Image caching
-   - API response caching
-   - Offline support
-
-4. **Testing**:
-   - Unit tests for providers
-   - Widget tests for screens
-   - Integration tests for flows
-
-## Contributing
-
-When adding new features:
-1. Follow existing code structure
-2. Use Provider for state management
-3. Add proper error handling
-4. Update this README
-
-## Support
-
-For backend API documentation, see `/backend/README.md`.
-For admin dashboard, see `/admin-dashboard/README.md`.
-
-## License
-
-This project is part of the video calling SaaS platform.
+For issues and questions, please refer to the IMPLEMENTATION_GUIDE.md or create an issue in the repository.
