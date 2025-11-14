@@ -11,6 +11,7 @@ import {
   Settings,
   FileText,
   LogOut,
+  Shield,
 } from 'lucide-react';
 import { clearAuth, getAdminData } from '@/lib/auth';
 
@@ -22,6 +23,7 @@ const navItems = [
   { href: '/dashboard/rooms', label: 'Rooms', icon: Video },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   { href: '/dashboard/audit-logs', label: 'Audit Logs', icon: FileText },
+  { href: '/dashboard/admins', label: 'Admins', icon: Shield, superAdminOnly: true },
 ];
 
 export default function Sidebar() {
@@ -43,26 +45,34 @@ export default function Sidebar() {
 
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
+          {navItems
+            .filter((item) => {
+              // Filter out super admin only items for regular admins
+              if ((item as any).superAdminOnly) {
+                return admin?.role === 'super_admin';
+              }
+              return true;
+            })
+            .map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
 
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-primary-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-800'
-                  }`}
-                >
-                  <Icon size={20} />
-                  <span>{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-primary-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-800'
+                    }`}
+                  >
+                    <Icon size={20} />
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
         </ul>
       </nav>
 
