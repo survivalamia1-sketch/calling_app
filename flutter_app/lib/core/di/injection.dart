@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive/hive.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 import '../constants/api_constants.dart';
@@ -34,6 +35,14 @@ import '../../features/home/domain/repositories/dashboard_repository.dart';
 import '../../features/home/domain/usecases/get_dashboard_stats.dart';
 import '../../features/home/domain/usecases/get_upcoming_meetings.dart';
 import '../../features/home/presentation/bloc/dashboard_bloc.dart';
+import '../../features/settings/data/datasources/settings_local_data_source.dart';
+import '../../features/settings/data/models/settings_model.dart';
+import '../../features/settings/data/repositories/settings_repository_impl.dart';
+import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../features/settings/domain/usecases/get_settings.dart';
+import '../../features/settings/domain/usecases/reset_settings.dart';
+import '../../features/settings/domain/usecases/update_settings.dart';
+import '../../features/settings/presentation/bloc/settings_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -211,6 +220,39 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  // ===========================
+  // Settings Feature
+  // ===========================
+
+  // Initialize Hive box for settings (must be done before registering)
+  final settingsBox = await Hive.openBox<SettingsModel>(SETTINGS_BOX);
+
+  // Data sources
+  getIt.registerLazySingleton<SettingsLocalDataSource>(
+    () => SettingsLocalDataSourceImpl(settingsBox: settingsBox),
+  );
+
+  // Repository
+  getIt.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(
+      localDataSource: getIt(),
+    ),
+  );
+
+  // Use cases
+  getIt.registerLazySingleton(() => GetSettings(getIt()));
+  getIt.registerLazySingleton(() => UpdateSettings(getIt()));
+  getIt.registerLazySingleton(() => ResetSettings(getIt()));
+
+  // Bloc
+  getIt.registerFactory(
+    () => SettingsBloc(
+      getSettings: getIt(),
+      updateSettings: getIt(),
+      resetSettings: getIt(),
+    ),
+  );
+
   // Call Feature
   // - WebRTCService
   // - SignalingService
@@ -219,8 +261,4 @@ Future<void> configureDependencies() async {
   // Profile Feature
   // - ProfileRepository
   // - ProfileBloc
-
-  // Settings Feature
-  // - SettingsRepository
-  // - SettingsBloc
 }

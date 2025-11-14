@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'core/di/injection.dart';
 import 'core/router/app_router.dart';
+import 'features/settings/data/models/settings_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+
+  // Register Hive adapters
+  Hive.registerAdapter(SettingsModelAdapter());
 
   // Initialize dependency injection
   await configureDependencies();
