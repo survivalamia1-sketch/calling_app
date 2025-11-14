@@ -10,6 +10,9 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/shell/presentation/pages/main_shell_page.dart';
 import '../../features/home/presentation/pages/home_dashboard_page.dart';
 import '../../features/meetings/presentation/pages/meetings_list_page.dart';
+import '../../features/meetings/presentation/pages/new_meeting_page.dart';
+import '../../features/meetings/presentation/pages/join_meeting_page.dart';
+import '../../features/meetings/presentation/bloc/meetings_bloc.dart';
 import '../../features/subscriptions/presentation/pages/subscription_plans_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
@@ -95,11 +98,14 @@ class AppRouter {
       // Routes outside shell (full screen)
       GoRoute(
         path: '/meetings/new',
-        builder: (context, state) => const Scaffold(
-          body: Center(
-            child: Text('New Meeting Page - TODO'),
-          ),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<MeetingsBloc>(),
+          child: const NewMeetingPage(),
         ),
+      ),
+      GoRoute(
+        path: '/meetings/join',
+        builder: (context, state) => const JoinMeetingPage(),
       ),
       GoRoute(
         path: '/call/:roomId',
