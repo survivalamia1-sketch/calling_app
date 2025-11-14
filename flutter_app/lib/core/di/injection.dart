@@ -21,6 +21,13 @@ import '../../features/meetings/domain/usecases/create_meeting.dart';
 import '../../features/meetings/domain/usecases/get_meetings.dart';
 import '../../features/meetings/domain/usecases/join_meeting.dart';
 import '../../features/meetings/presentation/bloc/meetings_bloc.dart';
+import '../../features/subscriptions/data/datasources/subscriptions_remote_data_source.dart';
+import '../../features/subscriptions/data/repositories/subscriptions_repository_impl.dart';
+import '../../features/subscriptions/domain/repositories/subscriptions_repository.dart';
+import '../../features/subscriptions/domain/usecases/create_checkout_session.dart';
+import '../../features/subscriptions/domain/usecases/get_current_subscription.dart';
+import '../../features/subscriptions/domain/usecases/get_plans.dart';
+import '../../features/subscriptions/presentation/bloc/subscriptions_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -138,10 +145,36 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  // ===========================
   // Subscriptions Feature
-  // - SubscriptionsRemoteDataSource
-  // - SubscriptionsRepository
-  // - SubscriptionsBloc
+  // ===========================
+
+  // Data sources
+  getIt.registerLazySingleton<SubscriptionsRemoteDataSource>(
+    () => SubscriptionsRemoteDataSourceImpl(client: getIt()),
+  );
+
+  // Repository
+  getIt.registerLazySingleton<SubscriptionsRepository>(
+    () => SubscriptionsRepositoryImpl(
+      remoteDataSource: getIt(),
+      networkInfo: getIt(),
+    ),
+  );
+
+  // Use cases
+  getIt.registerLazySingleton(() => GetPlans(getIt()));
+  getIt.registerLazySingleton(() => GetCurrentSubscription(getIt()));
+  getIt.registerLazySingleton(() => CreateCheckoutSession(getIt()));
+
+  // Bloc
+  getIt.registerFactory(
+    () => SubscriptionsBloc(
+      getPlansUseCase: getIt(),
+      getCurrentSubscriptionUseCase: getIt(),
+      createCheckoutSessionUseCase: getIt(),
+    ),
+  );
 
   // Call Feature
   // - WebRTCService

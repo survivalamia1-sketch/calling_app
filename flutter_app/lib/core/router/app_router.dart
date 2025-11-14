@@ -10,6 +10,10 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/shell/presentation/pages/main_shell_page.dart';
 import '../../features/home/presentation/pages/home_dashboard_page.dart';
 import '../../features/meetings/presentation/pages/meetings_list_page.dart';
+import '../../features/subscriptions/presentation/pages/subscription_plans_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/support/presentation/pages/support_page.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -72,27 +76,15 @@ class AppRouter {
           ),
           GoRoute(
             path: '/subscriptions',
-            builder: (context, state) => const Scaffold(
-              body: Center(
-                child: Text('Subscriptions Page - TODO'),
-              ),
-            ),
+            builder: (context, state) => const SubscriptionPlansPage(),
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const Scaffold(
-              body: Center(
-                child: Text('Settings Page - TODO'),
-              ),
-            ),
+            builder: (context, state) => const SettingsPage(),
           ),
           GoRoute(
             path: '/profile',
-            builder: (context, state) => const Scaffold(
-              body: Center(
-                child: Text('Profile Page - TODO'),
-              ),
-            ),
+            builder: (context, state) => const ProfilePage(),
           ),
         ],
       ),
@@ -118,10 +110,14 @@ class AppRouter {
         },
       ),
 
+      GoRoute(
+        path: '/support',
+        builder: (context, state) => const SupportPage(),
+      ),
+
       // TODO: Add other full-screen routes
       // - /meetings/:id (meeting details)
       // - /meetings/join (join by code)
-      // - /support
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
