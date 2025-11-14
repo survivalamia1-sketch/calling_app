@@ -96,6 +96,8 @@ func main() {
 			authProtected.Use(middleware.AuthMiddleware(cfg))
 			{
 				authProtected.GET("/profile", authHandler.GetProfile)
+				authProtected.PUT("/profile", authHandler.UpdateProfile)
+				authProtected.POST("/change-password", authHandler.ChangePassword)
 			}
 		}
 

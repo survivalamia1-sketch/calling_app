@@ -301,6 +301,65 @@ func (s *Service) GetUserByID(userID uuid.UUID) (*models.User, error) {
 	return &user, nil
 }
 
+// UpdateProfile updates user's profile information
+func (s *Service) UpdateProfile(userID uuid.UUID, firstName, lastName string) (*models.User, error) {
+	db := database.GetDB()
+
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	// Update fields
+	if firstName != "" {
+		user.FirstName = firstName
+	}
+	if lastName != "" {
+		user.LastName = lastName
+	}
+
+	if err := db.Save(&user).Error; err != nil {
+		return nil, fmt.Errorf("failed to update profile: %w", err)
+	}
+
+	// Reload with subscription
+	db.Preload("Subscription.Plan").First(&user, userID)
+
+	return &user, nil
+}
+
+// ChangePassword changes user's password (requires old password)
+func (s *Service) ChangePassword(userID uuid.UUID, oldPassword, newPassword string) error {
+	db := database.GetDB()
+
+	var user models.User
+	if err := db.First(&user, userID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("user not found")
+		}
+		return fmt.Errorf("database error: %w", err)
+	}
+
+	// Verify old password
+	if !user.CheckPassword(oldPassword) {
+		return errors.New("current password is incorrect")
+	}
+
+	// Hash new password
+	if err := user.HashPassword(newPassword); err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	if err := db.Save(&user).Error; err != nil {
+		return fmt.Errorf("failed to change password: %w", err)
+	}
+
+	return nil
+}
+
 // generateRandomToken generates a random token
 func generateRandomToken(length int) (string, error) {
 	bytes := make([]byte, length)

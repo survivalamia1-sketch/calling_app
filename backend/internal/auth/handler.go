@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/yourusername/calling-app-backend/internal/middleware"
 	"github.com/yourusername/calling-app-backend/pkg/config"
+	"github.com/yourusername/calling-app-backend/pkg/utils"
 )
 
 type Handler struct {
@@ -238,7 +240,7 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 	}
 
 	// Validate refresh token
-	claims, err := h.service.config.JWT.Secret, nil)
+	claims, err := utils.ValidateToken(input.RefreshToken, h.config)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid refresh token",
@@ -247,7 +249,7 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 	}
 
 	// Generate new access token
-	newToken, err := h.service.config.JWT.Secret, claims.Email, h.config)
+	newToken, err := utils.GenerateToken(claims.UserID, claims.Email, h.config)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to generate token",
@@ -257,5 +259,94 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": newToken,
+	})
+}
+
+// UpdateProfile godoc
+// @Summary Update user profile
+// @Description Update authenticated user's profile information
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param input body map[string]string true "Profile update input"
+// @Success 200 {object} models.PublicUser
+// @Failure 400 {object} map[string]interface{}
+// @Router /auth/profile [put]
+func (h *Handler) UpdateProfile(c *gin.Context) {
+	userID, exists := middleware.GetUserID(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	var input struct {
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid input",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	user, err := h.service.UpdateProfile(userID, input.FirstName, input.LastName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, user.ToPublic())
+}
+
+// ChangePassword godoc
+// @Summary Change password
+// @Description Change authenticated user's password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param input body map[string]string true "Password change input"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Router /auth/change-password [post]
+func (h *Handler) ChangePassword(c *gin.Context) {
+	userID, exists := middleware.GetUserID(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	var input struct {
+		OldPassword string `json:"old_password" binding:"required"`
+		NewPassword string `json:"new_password" binding:"required,min=8"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid input",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	if err := h.service.ChangePassword(userID, input.OldPassword, input.NewPassword); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Password changed successfully",
 	})
 }
