@@ -14,6 +14,9 @@ import '../../features/subscriptions/presentation/pages/subscription_plans_page.
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/support/presentation/pages/support_page.dart';
+import '../../features/call/presentation/pages/call_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/call/presentation/bloc/call_bloc.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -102,10 +105,9 @@ class AppRouter {
         path: '/call/:roomId',
         builder: (context, state) {
           final roomId = state.pathParameters['roomId']!;
-          return Scaffold(
-            body: Center(
-              child: Text('Call Page - Room: $roomId - TODO'),
-            ),
+          return BlocProvider(
+            create: (_) => getIt<CallBloc>(),
+            child: CallPage(roomId: roomId),
           );
         },
       ),

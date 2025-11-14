@@ -1,0 +1,189 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import '../../../../core/constants/api_constants.dart';
+
+enum SignalingState {
+  disconnected,
+  connecting,
+  connected,
+  error,
+}
+
+class SignalingMessage {
+  final String type;
+  final String? roomId;
+  final String? userId;
+  final Map<String, dynamic>? data;
+
+  SignalingMessage({
+    required this.type,
+    this.roomId,
+    this.userId,
+    this.data,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'type': type,
+        if (roomId != null) 'room_id': roomId,
+        if (userId != null) 'user_id': userId,
+        if (data != null) ...data!,
+      };
+
+  factory SignalingMessage.fromJson(Map<String, dynamic> json) {
+    return SignalingMessage(
+      type: json['type'] as String,
+      roomId: json['room_id'] as String?,
+      userId: json['user_id'] as String?,
+      data: json,
+    );
+  }
+}
+
+class SignalingService {
+  WebSocketChannel? _channel;
+  final StreamController<SignalingMessage> _messageController =
+      StreamController<SignalingMessage>.broadcast();
+  final StreamController<SignalingState> _stateController =
+      StreamController<SignalingState>.broadcast();
+
+  SignalingState _currentState = SignalingState.disconnected;
+
+  Stream<SignalingMessage> get messages => _messageController.stream;
+  Stream<SignalingState> get state => _stateController.stream;
+  SignalingState get currentState => _currentState;
+
+  /// Connect to signaling server
+  Future<void> connect(String token) async {
+    if (_currentState == SignalingState.connected) {
+      return; // Already connected
+    }
+
+    try {
+      _updateState(SignalingState.connecting);
+
+      // Get WebSocket URL from API base URL
+      final wsUrl = ApiConstants.apiBaseUrl
+          .replaceFirst('http://', 'ws://')
+          .replaceFirst('https://', 'wss://');
+
+      _channel = WebSocketChannel.connect(
+        Uri.parse('$wsUrl/ws/signaling?token=$token'),
+      );
+
+      _channel!.stream.listen(
+        (data) {
+          try {
+            final message = json.decode(data as String);
+            final signalingMessage = SignalingMessage.fromJson(message);
+            _messageController.add(signalingMessage);
+          } catch (e) {
+            print('Error parsing signaling message: $e');
+          }
+        },
+        onError: (error) {
+          print('WebSocket error: $error');
+          _updateState(SignalingState.error);
+        },
+        onDone: () {
+          print('WebSocket connection closed');
+          _updateState(SignalingState.disconnected);
+        },
+      );
+
+      _updateState(SignalingState.connected);
+    } catch (e) {
+      print('Failed to connect to signaling server: $e');
+      _updateState(SignalingState.error);
+      rethrow;
+    }
+  }
+
+  /// Send a signaling message
+  void send(SignalingMessage message) {
+    if (_channel == null || _currentState != SignalingState.connected) {
+      throw Exception('Not connected to signaling server');
+    }
+
+    final jsonMessage = json.encode(message.toJson());
+    _channel!.sink.add(jsonMessage);
+  }
+
+  /// Join a room
+  void joinRoom(String roomId, String userId) {
+    send(SignalingMessage(
+      type: 'join',
+      roomId: roomId,
+      userId: userId,
+    ));
+  }
+
+  /// Leave a room
+  void leaveRoom(String roomId, String userId) {
+    send(SignalingMessage(
+      type: 'leave',
+      roomId: roomId,
+      userId: userId,
+    ));
+  }
+
+  /// Send SDP offer
+  void sendOffer(String roomId, String userId, RTCSessionDescription offer) {
+    send(SignalingMessage(
+      type: 'offer',
+      roomId: roomId,
+      userId: userId,
+      data: {
+        'sdp': offer.sdp,
+        'sdp_type': offer.type,
+      },
+    ));
+  }
+
+  /// Send SDP answer
+  void sendAnswer(String roomId, String userId, RTCSessionDescription answer) {
+    send(SignalingMessage(
+      type: 'answer',
+      roomId: roomId,
+      userId: userId,
+      data: {
+        'sdp': answer.sdp,
+        'sdp_type': answer.type,
+      },
+    ));
+  }
+
+  /// Send ICE candidate
+  void sendIceCandidate(
+    String roomId,
+    String userId,
+    RTCIceCandidate candidate,
+  ) {
+    send(SignalingMessage(
+      type: 'ice_candidate',
+      roomId: roomId,
+      userId: userId,
+      data: {
+        'candidate': candidate.candidate,
+        'sdp_mid': candidate.sdpMid,
+        'sdp_mline_index': candidate.sdpMLineIndex,
+      },
+    ));
+  }
+
+  /// Update signaling state
+  void _updateState(SignalingState newState) {
+    _currentState = newState;
+    _stateController.add(newState);
+  }
+
+  /// Disconnect and cleanup
+  Future<void> dispose() async {
+    await _channel?.sink.close();
+    _channel = null;
+    _updateState(SignalingState.disconnected);
+    await _messageController.close();
+    await _stateController.close();
+  }
+}

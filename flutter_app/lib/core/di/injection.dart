@@ -55,6 +55,16 @@ import '../../features/support/domain/repositories/support_repository.dart';
 import '../../features/support/domain/usecases/get_faqs.dart';
 import '../../features/support/domain/usecases/submit_bug_report.dart';
 import '../../features/support/presentation/bloc/support_bloc.dart';
+import '../../features/call/data/repositories/call_repository_impl.dart';
+import '../../features/call/data/services/signaling_service.dart';
+import '../../features/call/data/services/webrtc_service.dart';
+import '../../features/call/domain/repositories/call_repository.dart';
+import '../../features/call/domain/usecases/join_call.dart';
+import '../../features/call/domain/usecases/leave_call.dart';
+import '../../features/call/domain/usecases/switch_camera.dart';
+import '../../features/call/domain/usecases/toggle_audio.dart';
+import '../../features/call/domain/usecases/toggle_video.dart';
+import '../../features/call/presentation/bloc/call_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -323,8 +333,40 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  // ===========================
   // Call Feature
-  // - WebRTCService
-  // - SignalingService
-  // - CallBloc
+  // ===========================
+
+  // Services
+  getIt.registerLazySingleton(() => WebRTCService());
+  getIt.registerLazySingleton(() => SignalingService());
+
+  // Repository
+  getIt.registerLazySingleton<CallRepository>(
+    () => CallRepositoryImpl(
+      webrtcService: getIt(),
+      signalingService: getIt(),
+      storage: getIt(),
+    ),
+  );
+
+  // Use cases
+  getIt.registerLazySingleton(() => JoinCall(getIt()));
+  getIt.registerLazySingleton(() => LeaveCall(getIt()));
+  getIt.registerLazySingleton(() => ToggleAudio(getIt()));
+  getIt.registerLazySingleton(() => ToggleVideo(getIt()));
+  getIt.registerLazySingleton(() => SwitchCamera(getIt()));
+
+  // Bloc
+  getIt.registerFactory(
+    () => CallBloc(
+      joinCall: getIt(),
+      leaveCall: getIt(),
+      toggleAudio: getIt(),
+      toggleVideo: getIt(),
+      switchCamera: getIt(),
+      repository: getIt(),
+      webrtcService: getIt(),
+    ),
+  );
 }
