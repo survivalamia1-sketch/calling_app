@@ -28,6 +28,12 @@ import '../../features/subscriptions/domain/usecases/create_checkout_session.dar
 import '../../features/subscriptions/domain/usecases/get_current_subscription.dart';
 import '../../features/subscriptions/domain/usecases/get_plans.dart';
 import '../../features/subscriptions/presentation/bloc/subscriptions_bloc.dart';
+import '../../features/home/data/datasources/dashboard_remote_data_source.dart';
+import '../../features/home/data/repositories/dashboard_repository_impl.dart';
+import '../../features/home/domain/repositories/dashboard_repository.dart';
+import '../../features/home/domain/usecases/get_dashboard_stats.dart';
+import '../../features/home/domain/usecases/get_upcoming_meetings.dart';
+import '../../features/home/presentation/bloc/dashboard_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -173,6 +179,35 @@ Future<void> configureDependencies() async {
       getPlansUseCase: getIt(),
       getCurrentSubscriptionUseCase: getIt(),
       createCheckoutSessionUseCase: getIt(),
+    ),
+  );
+
+  // ===========================
+  // Home/Dashboard Feature
+  // ===========================
+
+  // Data sources
+  getIt.registerLazySingleton<DashboardRemoteDataSource>(
+    () => DashboardRemoteDataSourceImpl(client: getIt()),
+  );
+
+  // Repository
+  getIt.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(
+      remoteDataSource: getIt(),
+      networkInfo: getIt(),
+    ),
+  );
+
+  // Use cases
+  getIt.registerLazySingleton(() => GetDashboardStats(getIt()));
+  getIt.registerLazySingleton(() => GetUpcomingMeetings(getIt()));
+
+  // Bloc
+  getIt.registerFactory(
+    () => DashboardBloc(
+      getDashboardStats: getIt(),
+      getUpcomingMeetings: getIt(),
     ),
   );
 
