@@ -395,6 +395,7 @@ Future<void> configureDependencies() async {
       webrtcService: getIt(),
       signalingService: getIt(),
       storage: getIt(),
+      dio: getIt(),
     ),
   );
 
