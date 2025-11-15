@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/exceptions.dart';
+import '../../../../core/utils/app_logger.dart';
 import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
@@ -46,6 +47,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String password,
   }) async {
+    AppLogger.dataSource('AuthRemoteDataSource', 'login', params: {'email': email});
+
     try {
       final response = await client.post(
         ApiConstants.authLogin,
@@ -56,26 +59,31 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
+        AppLogger.i('✅ Login successful for: $email');
         return {
           'user': UserModel.fromJson(response.data['user']),
           'token': response.data['token'] as String,
           'refresh_token': response.data['refresh_token'] as String?,
         };
       } else {
-        throw ServerException(
-            message: response.data['message'] ?? 'Login failed');
+        final error = response.data['message'] ?? 'Login failed';
+        AppLogger.w('⚠️ Login failed: $error');
+        throw ServerException(message: error);
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException(
-            message: e.response?.data['message'] ?? 'Invalid credentials');
+        final message = e.response?.data['error'] ?? e.response?.data['message'] ?? 'Invalid credentials';
+        AppLogger.w('🔒 Login unauthorized: $message');
+        throw UnauthorizedException(message: message);
       } else if (e.response?.statusCode == 403) {
-        final message = e.response?.data['message'] ?? '';
+        final message = e.response?.data['error'] ?? e.response?.data['message'] ?? '';
+        AppLogger.w('🚫 Login forbidden: $message');
         if (message.toLowerCase().contains('not verified')) {
           throw UnauthorizedException(message: message);
         }
         throw UnauthorizedException(message: message);
       }
+      AppLogger.e('❌ Login error', error: e);
       throw ServerException(message: e.message ?? 'Network error');
     }
   }
@@ -87,6 +95,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String firstName,
     required String lastName,
   }) async {
+    AppLogger.dataSource('AuthRemoteDataSource', 'register', params: {
+      'email': email,
+      'first_name': firstName,
+      'last_name': lastName,
+    });
+
     try {
       final response = await client.post(
         ApiConstants.authRegister,
@@ -99,6 +113,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
+        AppLogger.i('✅ Registration successful for: $email');
         return {
           'user': UserModel.fromJson(response.data['user']),
           'token': response.data['token'] as String?,
@@ -106,14 +121,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               response.data['requires_email_verification'] ?? true,
         };
       } else {
-        throw ServerException(
-            message: response.data['message'] ?? 'Registration failed');
+        final error = response.data['error'] ?? response.data['message'] ?? 'Registration failed';
+        AppLogger.w('⚠️ Registration failed: $error');
+        throw ServerException(message: error);
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 400) {
-        throw ServerException(
-            message: e.response?.data['message'] ?? 'Invalid data');
+        final errorMsg = e.response?.data['error'] ?? e.response?.data['message'] ?? 'Invalid data';
+        final fields = e.response?.data['fields'];
+
+        if (fields != null) {
+          AppLogger.w('⚠️ Registration validation failed: $fields');
+          throw ServerException(message: 'Validation failed: $fields');
+        }
+
+        AppLogger.w('⚠️ Registration bad request: $errorMsg');
+        throw ServerException(message: errorMsg);
       }
+      AppLogger.e('❌ Registration error', error: e);
       throw ServerException(message: e.message ?? 'Network error');
     }
   }

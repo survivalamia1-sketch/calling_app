@@ -68,6 +68,7 @@ import '../../features/support/presentation/bloc/support_bloc.dart'
     hide SubmitBugReport;
 import '../constants/api_constants.dart';
 import '../network/network_info.dart';
+import '../utils/app_logger.dart';
 
 final getIt = GetIt.instance;
 
@@ -91,7 +92,39 @@ Future<void> configureDependencies() async {
           'Accept': 'application/json',
         },
       ),
-    )..interceptors.add(
+    )..interceptors.addAll([
+        // Logging interceptor
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            AppLogger.apiRequest(
+              options.method,
+              options.uri.toString(),
+              data: options.data is Map<String, dynamic>
+                ? options.data as Map<String, dynamic>
+                : null,
+            );
+            return handler.next(options);
+          },
+          onResponse: (response, handler) {
+            AppLogger.apiResponse(
+              response.requestOptions.method,
+              response.requestOptions.uri.toString(),
+              response.statusCode ?? 0,
+              data: response.data,
+            );
+            return handler.next(response);
+          },
+          onError: (error, handler) {
+            AppLogger.apiError(
+              error.requestOptions.method,
+              error.requestOptions.uri.toString(),
+              error,
+              stackTrace: error.stackTrace,
+            );
+            return handler.next(error);
+          },
+        ),
+        // Auth token interceptor
         InterceptorsWrapper(
           onRequest: (options, handler) async {
             // Add auth token to requests
@@ -99,12 +132,14 @@ Future<void> configureDependencies() async {
             final token = await storage.read(key: 'auth_token');
             if (token != null) {
               options.headers['Authorization'] = 'Bearer $token';
+              AppLogger.d('🔑 Added auth token to request');
             }
             return handler.next(options);
           },
           onError: (error, handler) async {
             // Handle 401 errors globally
             if (error.response?.statusCode == 401) {
+              AppLogger.w('🔒 Unauthorized - clearing auth data');
               // Token expired or invalid - clear local data
               final storage = getIt<FlutterSecureStorage>();
               await storage.delete(key: 'auth_token');
@@ -113,7 +148,7 @@ Future<void> configureDependencies() async {
             return handler.next(error);
           },
         ),
-      ),
+      ]),
   );
 
   // ===========================

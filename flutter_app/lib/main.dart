@@ -1,23 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'core/di/injection.dart';
+import 'core/observers/app_bloc_observer.dart';
 import 'core/router/app_router.dart';
+import 'core/utils/app_logger.dart';
 import 'features/settings/data/models/settings_model.dart';
 
 void main() async {
+  // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Hive
-  await Hive.initFlutter();
+  AppLogger.i('🚀 Application Starting...');
 
-  // Register Hive adapters
-  Hive.registerAdapter(SettingsModelAdapter());
+  try {
+    // Set up BLoC observer for global state logging
+    Bloc.observer = AppBlocObserver();
+    AppLogger.i('✅ BLoC Observer configured');
 
-  // Initialize dependency injection
-  await configureDependencies();
+    // Initialize Hive
+    await Hive.initFlutter();
+    AppLogger.i('✅ Hive initialized');
 
-  runApp(const MyApp());
+    // Register Hive adapters
+    Hive.registerAdapter(SettingsModelAdapter());
+    AppLogger.i('✅ Hive adapters registered');
+
+    // Initialize dependency injection
+    await configureDependencies();
+    AppLogger.i('✅ Dependency injection configured');
+
+    AppLogger.i('🎉 Application initialized successfully');
+
+    runApp(const MyApp());
+  } catch (e, stackTrace) {
+    AppLogger.e('❌ Failed to initialize app', error: e, stackTrace: stackTrace);
+    rethrow;
+  }
 }
 
 class MyApp extends StatelessWidget {
