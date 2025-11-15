@@ -1,9 +1,12 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/yourusername/calling-app-backend/internal/middleware"
 	"github.com/yourusername/calling-app-backend/pkg/config"
 	"github.com/yourusername/calling-app-backend/pkg/utils"
@@ -21,6 +24,31 @@ func NewHandler(cfg *config.Config) *Handler {
 	}
 }
 
+// Helper function to format validation errors
+func formatValidationError(err error) map[string]string {
+	errors := make(map[string]string)
+
+	if validationErrs, ok := err.(validator.ValidationErrors); ok {
+		for _, e := range validationErrs {
+			field := e.Field()
+			switch e.Tag() {
+			case "required":
+				errors[field] = fmt.Sprintf("%s is required", field)
+			case "email":
+				errors[field] = "Invalid email format"
+			case "min":
+				errors[field] = fmt.Sprintf("%s must be at least %s characters", field, e.Param())
+			case "max":
+				errors[field] = fmt.Sprintf("%s must be at most %s characters", field, e.Param())
+			default:
+				errors[field] = fmt.Sprintf("%s is invalid", field)
+			}
+		}
+	}
+
+	return errors
+}
+
 // Register godoc
 // @Summary Register a new user
 // @Description Create a new user account
@@ -35,8 +63,19 @@ func (h *Handler) Register(c *gin.Context) {
 	var input RegisterInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
+		// Format validation errors for better client understanding
+		validationErrors := formatValidationError(err)
+		if len(validationErrors) > 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":  "Validation failed",
+				"fields": validationErrors,
+			})
+			return
+		}
+
+		// Generic binding error
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid input",
+			"error":   "Invalid request",
 			"details": err.Error(),
 		})
 		return
@@ -67,8 +106,19 @@ func (h *Handler) Login(c *gin.Context) {
 	var input LoginInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
+		// Format validation errors for better client understanding
+		validationErrors := formatValidationError(err)
+		if len(validationErrors) > 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":  "Validation failed",
+				"fields": validationErrors,
+			})
+			return
+		}
+
+		// Generic binding error
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid input",
+			"error":   "Invalid request",
 			"details": err.Error(),
 		})
 		return
