@@ -17,7 +17,7 @@ class AppLogger {
       lineLength: 120,
       colors: true,
       printEmojis: true,
-      printTime: true,
+      dateTimeFormat: DateTimeFormat.onlyTime,
     ),
   );
 
@@ -71,7 +71,8 @@ class AppLogger {
   }
 
   /// Log API request
-  static void apiRequest(String method, String url, {Map<String, dynamic>? data}) {
+  static void apiRequest(String method, String url,
+      {Map<String, dynamic>? data}) {
     _logger.i('🌐 API Request: $method $url', time: DateTime.now());
     if (data != null && data.isNotEmpty) {
       // Mask sensitive data
@@ -81,16 +82,19 @@ class AppLogger {
   }
 
   /// Log API response
-  static void apiResponse(String method, String url, int statusCode, {dynamic data}) {
+  static void apiResponse(String method, String url, int statusCode,
+      {dynamic data}) {
     final emoji = statusCode >= 200 && statusCode < 300 ? '✅' : '❌';
-    _logger.i('$emoji API Response: $method $url - Status: $statusCode', time: DateTime.now());
+    _logger.i('$emoji API Response: $method $url - Status: $statusCode',
+        time: DateTime.now());
     if (data != null) {
       _logger.d('📥 Response Data: $data');
     }
   }
 
   /// Log API error
-  static void apiError(String method, String url, Object error, {StackTrace? stackTrace}) {
+  static void apiError(String method, String url, Object error,
+      {StackTrace? stackTrace}) {
     _logger.e(
       '❌ API Error: $method $url',
       time: DateTime.now(),
@@ -124,7 +128,8 @@ class AppLogger {
   }
 
   /// Log repository call
-  static void repository(String repositoryName, String method, {Map<String, dynamic>? params}) {
+  static void repository(String repositoryName, String method,
+      {Map<String, dynamic>? params}) {
     _logger.i('💾 Repository: $repositoryName.$method', time: DateTime.now());
     if (params != null && params.isNotEmpty) {
       final maskedParams = _maskSensitiveData(params);
@@ -133,7 +138,8 @@ class AppLogger {
   }
 
   /// Log data source call
-  static void dataSource(String dataSourceName, String method, {Map<String, dynamic>? params}) {
+  static void dataSource(String dataSourceName, String method,
+      {Map<String, dynamic>? params}) {
     _logger.i('🗄️  DataSource: $dataSourceName.$method', time: DateTime.now());
     if (params != null && params.isNotEmpty) {
       final maskedParams = _maskSensitiveData(params);
@@ -144,10 +150,17 @@ class AppLogger {
   /// Mask sensitive data in logs
   static Map<String, dynamic> _maskSensitiveData(Map<String, dynamic> data) {
     final masked = Map<String, dynamic>.from(data);
-    final sensitiveKeys = ['password', 'token', 'secret', 'api_key', 'authorization'];
+    final sensitiveKeys = [
+      'password',
+      'token',
+      'secret',
+      'api_key',
+      'authorization'
+    ];
 
     masked.forEach((key, value) {
-      if (sensitiveKeys.any((sensitiveKey) => key.toLowerCase().contains(sensitiveKey))) {
+      if (sensitiveKeys
+          .any((sensitiveKey) => key.toLowerCase().contains(sensitiveKey))) {
         masked[key] = '***MASKED***';
       } else if (value is Map<String, dynamic>) {
         masked[key] = _maskSensitiveData(value);
@@ -173,6 +186,7 @@ extension LoggerExtension on Object {
   }
 
   void logError(String message, {Object? error, StackTrace? stackTrace}) {
-    AppLogger.e('[$runtimeType] $message', error: error, stackTrace: stackTrace);
+    AppLogger.e('[$runtimeType] $message',
+        error: error, stackTrace: stackTrace);
   }
 }

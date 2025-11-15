@@ -2,60 +2,68 @@ import 'package:equatable/equatable.dart';
 
 class SubscriptionPlan extends Equatable {
   final String id;
+  final String type; // 'free', 'pro', 'business'
   final String name;
   final String description;
-  final double monthlyPrice;
-  final double yearlyPrice;
+  final int price; // in cents
+  final String currency;
+  final String? stripePriceId;
+  final int maxMeetingDuration; // in minutes (0 = unlimited)
   final int maxParticipants;
-  final int maxMeetingDuration; // in minutes
-  final int maxMonthlyMeetings;
-  final bool hasRecording;
-  final bool hasScreenShare;
-  final bool hasWaitingRoom;
-  final bool hasCustomBranding;
-  final String priority; // 'free', 'pro', 'enterprise'
-  final List<String> features;
+  final bool canRecord;
+  final bool canScreenShare;
+  final int cloudStorageGB;
+  final bool canCustomBrand;
+  final bool hasApiAccess;
+  final bool hasPrioritySupport;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   const SubscriptionPlan({
     required this.id,
+    required this.type,
     required this.name,
     required this.description,
-    required this.monthlyPrice,
-    required this.yearlyPrice,
-    required this.maxParticipants,
+    required this.price,
+    required this.currency,
+    this.stripePriceId,
     required this.maxMeetingDuration,
-    required this.maxMonthlyMeetings,
-    required this.hasRecording,
-    required this.hasScreenShare,
-    required this.hasWaitingRoom,
-    required this.hasCustomBranding,
-    required this.priority,
-    required this.features,
+    required this.maxParticipants,
+    required this.canRecord,
+    required this.canScreenShare,
+    required this.cloudStorageGB,
+    required this.canCustomBrand,
+    required this.hasApiAccess,
+    required this.hasPrioritySupport,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  bool get isFree => priority == 'free';
-  bool get isPro => priority == 'pro';
-  bool get isEnterprise => priority == 'enterprise';
+  bool get isFree => type == 'free';
+  bool get isPro => type == 'pro';
+  bool get isBusiness => type == 'business';
 
-  double get monthlySavings => (monthlyPrice * 12) - yearlyPrice;
-  double get yearlyPriceMonthly => yearlyPrice / 12;
+  double get priceInDollars => price / 100.0;
 
   @override
   List<Object?> get props => [
         id,
+        type,
         name,
         description,
-        monthlyPrice,
-        yearlyPrice,
-        maxParticipants,
+        price,
+        currency,
+        stripePriceId,
         maxMeetingDuration,
-        maxMonthlyMeetings,
-        hasRecording,
-        hasScreenShare,
-        hasWaitingRoom,
-        hasCustomBranding,
-        priority,
-        features,
+        maxParticipants,
+        canRecord,
+        canScreenShare,
+        cloudStorageGB,
+        canCustomBrand,
+        hasApiAccess,
+        hasPrioritySupport,
+        createdAt,
+        updatedAt,
       ];
 }
 
@@ -89,8 +97,7 @@ class UserSubscription extends Equatable {
   bool get isExpired => status == 'expired';
   bool get isTrial => status == 'trial';
 
-  int get daysRemaining =>
-      currentPeriodEnd.difference(DateTime.now()).inDays;
+  int get daysRemaining => currentPeriodEnd.difference(DateTime.now()).inDays;
 
   @override
   List<Object?> get props => [

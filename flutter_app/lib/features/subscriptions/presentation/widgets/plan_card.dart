@@ -19,14 +19,14 @@ class PlanCard extends StatelessWidget {
   Color _getPlanColor(BuildContext context) {
     if (plan.isFree) return Colors.grey;
     if (plan.isPro) return Colors.blue;
-    if (plan.isEnterprise) return Colors.purple;
+    if (plan.isBusiness) return Colors.purple;
     return Theme.of(context).colorScheme.primary;
   }
 
   @override
   Widget build(BuildContext context) {
-    final price = isYearly ? plan.yearlyPriceMonthly : plan.monthlyPrice;
-    final totalPrice = isYearly ? plan.yearlyPrice : plan.monthlyPrice;
+    // Backend sends price in cents, convert to dollars
+    final priceInDollars = plan.priceInDollars;
     final planColor = _getPlanColor(context);
 
     return Card(
@@ -92,7 +92,7 @@ class PlanCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '\$${price.toStringAsFixed(0)}',
+                    '\$${priceInDollars.toStringAsFixed(2)}',
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: planColor,
@@ -113,22 +113,15 @@ class PlanCard extends StatelessWidget {
                   ),
                 ],
               ),
-              if (isYearly) ...[
+              if (plan.price > 0) ...[
                 const SizedBox(height: 4),
                 Text(
-                  'Billed \$${totalPrice.toStringAsFixed(0)} yearly',
+                  'Billed \$${(priceInDollars * 12).toStringAsFixed(2)} yearly',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
                             .withValues(alpha: 0.6),
-                      ),
-                ),
-                Text(
-                  'Save \$${plan.monthlySavings.toStringAsFixed(0)} per year',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.green,
-                        fontWeight: FontWeight.w600,
                       ),
                 ),
               ],
@@ -155,32 +148,23 @@ class PlanCard extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Features
-              ...plan.features.map((feature) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 20,
-                        color: planColor,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          feature,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    height: 1.5,
-                                  ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
+              // Features (built from plan properties)
+              if (plan.canRecord)
+                _buildFeatureItem(context, planColor, 'Recording'),
+              if (plan.canScreenShare)
+                _buildFeatureItem(context, planColor, 'Screen Sharing'),
+              if (plan.canCustomBrand)
+                _buildFeatureItem(context, planColor, 'Custom Branding'),
+              if (plan.hasApiAccess)
+                _buildFeatureItem(context, planColor, 'API Access'),
+              if (plan.hasPrioritySupport)
+                _buildFeatureItem(context, planColor, 'Priority Support'),
+              if (plan.cloudStorageGB > 0)
+                _buildFeatureItem(
+                  context,
+                  planColor,
+                  '${plan.cloudStorageGB} GB Cloud Storage',
+                ),
 
               // Technical Limits
               const SizedBox(height: 16),
@@ -195,26 +179,42 @@ class PlanCard extends StatelessWidget {
               _buildLimitItem(
                 context,
                 Icons.access_time,
-                '${plan.maxMeetingDuration} min meeting duration',
+                plan.maxMeetingDuration > 0
+                    ? '${plan.maxMeetingDuration} min meeting duration'
+                    : 'Unlimited meeting duration',
               ),
-              if (plan.maxMonthlyMeetings > 0) ...[
-                const SizedBox(height: 8),
-                _buildLimitItem(
-                  context,
-                  Icons.event,
-                  '${plan.maxMonthlyMeetings} meetings/month',
-                ),
-              ] else ...[
-                const SizedBox(height: 8),
-                _buildLimitItem(
-                  context,
-                  Icons.event,
-                  'Unlimited meetings',
-                ),
-              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(
+    BuildContext context,
+    Color color,
+    String feature,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.check_circle,
+            size: 20,
+            color: color,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              feature,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                  ),
+            ),
+          ),
+        ],
       ),
     );
   }

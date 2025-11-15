@@ -12,8 +12,8 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       firstName: json['first_name'] as String,
       lastName: json['last_name'] as String,
       isActive: json['is_active'] as bool,
-      isVerified: json['is_verified'] as bool,
-      planType: json['plan_type'] as String,
+      isVerified: json['email_verified'] as bool? ?? false,
+      planType: json['subscription_plan'] as String,
       createdAt: json['created_at'] as String,
       emailVerifiedAt: json['email_verified_at'] as String?,
     );
@@ -24,8 +24,8 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'first_name': instance.firstName,
       'last_name': instance.lastName,
       'is_active': instance.isActive,
-      'is_verified': instance.isVerified,
-      'plan_type': instance.planType,
+      'email_verified': instance.isVerified,
+      'subscription_plan': instance.planType,
       'created_at': instance.createdAt,
       'email_verified_at': instance.emailVerifiedAt,
     };

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import '../../domain/entities/subscription_plan.dart';
 
 part 'subscription_plan_model.g.dart';
@@ -8,60 +9,72 @@ class SubscriptionPlanModel {
   @JsonKey(name: 'id')
   final String id;
 
+  @JsonKey(name: 'type')
+  final String type;
+
   @JsonKey(name: 'name')
   final String name;
 
   @JsonKey(name: 'description')
   final String description;
 
-  @JsonKey(name: 'monthly_price')
-  final double monthlyPrice;
+  @JsonKey(name: 'price', defaultValue: 0)
+  final int price; // in cents
 
-  @JsonKey(name: 'yearly_price')
-  final double yearlyPrice;
+  @JsonKey(name: 'currency', defaultValue: 'usd')
+  final String currency;
 
-  @JsonKey(name: 'max_participants')
+  @JsonKey(name: 'stripe_price_id')
+  final String? stripePriceId;
+
+  @JsonKey(name: 'max_meeting_duration', defaultValue: 0)
+  final int maxMeetingDuration; // in minutes (0 = unlimited)
+
+  @JsonKey(name: 'max_participants', defaultValue: 0)
   final int maxParticipants;
 
-  @JsonKey(name: 'max_meeting_duration')
-  final int maxMeetingDuration;
+  @JsonKey(name: 'can_record', defaultValue: false)
+  final bool canRecord;
 
-  @JsonKey(name: 'max_monthly_meetings')
-  final int maxMonthlyMeetings;
+  @JsonKey(name: 'can_screen_share', defaultValue: false)
+  final bool canScreenShare;
 
-  @JsonKey(name: 'has_recording')
-  final bool hasRecording;
+  @JsonKey(name: 'cloud_storage_gb', defaultValue: 0)
+  final int cloudStorageGB;
 
-  @JsonKey(name: 'has_screen_share')
-  final bool hasScreenShare;
+  @JsonKey(name: 'can_custom_brand', defaultValue: false)
+  final bool canCustomBrand;
 
-  @JsonKey(name: 'has_waiting_room')
-  final bool hasWaitingRoom;
+  @JsonKey(name: 'has_api_access', defaultValue: false)
+  final bool hasApiAccess;
 
-  @JsonKey(name: 'has_custom_branding')
-  final bool hasCustomBranding;
+  @JsonKey(name: 'has_priority_support', defaultValue: false)
+  final bool hasPrioritySupport;
 
-  @JsonKey(name: 'priority')
-  final String priority;
+  @JsonKey(name: 'created_at')
+  final String createdAt;
 
-  @JsonKey(name: 'features')
-  final List<String> features;
+  @JsonKey(name: 'updated_at')
+  final String updatedAt;
 
   const SubscriptionPlanModel({
     required this.id,
+    required this.type,
     required this.name,
     required this.description,
-    required this.monthlyPrice,
-    required this.yearlyPrice,
-    required this.maxParticipants,
+    required this.price,
+    required this.currency,
+    this.stripePriceId,
     required this.maxMeetingDuration,
-    required this.maxMonthlyMeetings,
-    required this.hasRecording,
-    required this.hasScreenShare,
-    required this.hasWaitingRoom,
-    required this.hasCustomBranding,
-    required this.priority,
-    required this.features,
+    required this.maxParticipants,
+    required this.canRecord,
+    required this.canScreenShare,
+    required this.cloudStorageGB,
+    required this.canCustomBrand,
+    required this.hasApiAccess,
+    required this.hasPrioritySupport,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory SubscriptionPlanModel.fromJson(Map<String, dynamic> json) =>
@@ -72,19 +85,22 @@ class SubscriptionPlanModel {
   SubscriptionPlan toDomain() {
     return SubscriptionPlan(
       id: id,
+      type: type,
       name: name,
       description: description,
-      monthlyPrice: monthlyPrice,
-      yearlyPrice: yearlyPrice,
-      maxParticipants: maxParticipants,
+      price: price,
+      currency: currency,
+      stripePriceId: stripePriceId,
       maxMeetingDuration: maxMeetingDuration,
-      maxMonthlyMeetings: maxMonthlyMeetings,
-      hasRecording: hasRecording,
-      hasScreenShare: hasScreenShare,
-      hasWaitingRoom: hasWaitingRoom,
-      hasCustomBranding: hasCustomBranding,
-      priority: priority,
-      features: features,
+      maxParticipants: maxParticipants,
+      canRecord: canRecord,
+      canScreenShare: canScreenShare,
+      cloudStorageGB: cloudStorageGB,
+      canCustomBrand: canCustomBrand,
+      hasApiAccess: hasApiAccess,
+      hasPrioritySupport: hasPrioritySupport,
+      createdAt: DateTime.parse(createdAt),
+      updatedAt: DateTime.parse(updatedAt),
     );
   }
 }
@@ -104,15 +120,15 @@ class UserSubscriptionModel {
   final String status;
 
   @JsonKey(name: 'billing_cycle')
-  final String billingCycle;
+  final String? billingCycle;
 
   @JsonKey(name: 'current_period_start')
-  final String currentPeriodStart;
+  final String? currentPeriodStart;
 
   @JsonKey(name: 'current_period_end')
-  final String currentPeriodEnd;
+  final String? currentPeriodEnd;
 
-  @JsonKey(name: 'cancel_at_period_end')
+  @JsonKey(name: 'cancel_at_period_end', defaultValue: false)
   final bool cancelAtPeriodEnd;
 
   @JsonKey(name: 'canceled_at')
@@ -126,9 +142,9 @@ class UserSubscriptionModel {
     required this.userId,
     required this.planId,
     required this.status,
-    required this.billingCycle,
-    required this.currentPeriodStart,
-    required this.currentPeriodEnd,
+    this.billingCycle,
+    this.currentPeriodStart,
+    this.currentPeriodEnd,
     required this.cancelAtPeriodEnd,
     this.canceledAt,
     required this.createdAt,
@@ -145,9 +161,13 @@ class UserSubscriptionModel {
       userId: userId,
       planId: planId,
       status: status,
-      billingCycle: billingCycle,
-      currentPeriodStart: DateTime.parse(currentPeriodStart),
-      currentPeriodEnd: DateTime.parse(currentPeriodEnd),
+      billingCycle: billingCycle ?? 'monthly', // Default to monthly if null
+      currentPeriodStart: currentPeriodStart != null
+          ? DateTime.parse(currentPeriodStart!)
+          : DateTime.now(),
+      currentPeriodEnd: currentPeriodEnd != null
+          ? DateTime.parse(currentPeriodEnd!)
+          : DateTime.now().add(const Duration(days: 30)),
       cancelAtPeriodEnd: cancelAtPeriodEnd,
       canceledAt: canceledAt != null ? DateTime.parse(canceledAt!) : null,
       createdAt: DateTime.parse(createdAt),

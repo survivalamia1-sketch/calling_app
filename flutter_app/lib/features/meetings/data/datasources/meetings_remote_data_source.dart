@@ -64,7 +64,15 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['rooms'] ?? response.data;
+        // Backend returns array directly, not wrapped
+        final List<dynamic> data;
+        if (response.data is List) {
+          data = response.data as List<dynamic>;
+        } else if (response.data is Map && response.data['rooms'] != null) {
+          data = response.data['rooms'] as List<dynamic>;
+        } else {
+          data = [];
+        }
         return data.map((json) => MeetingModel.fromJson(json)).toList();
       } else {
         throw const ServerException(message: 'Failed to get meetings');

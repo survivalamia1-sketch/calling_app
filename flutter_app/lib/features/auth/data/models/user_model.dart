@@ -20,10 +20,10 @@ class UserModel {
   @JsonKey(name: 'is_active')
   final bool isActive;
 
-  @JsonKey(name: 'is_verified')
+  @JsonKey(name: 'email_verified', defaultValue: false)
   final bool isVerified;
 
-  @JsonKey(name: 'plan_type')
+  @JsonKey(name: 'subscription_plan')
   final String planType;
 
   @JsonKey(name: 'created_at')

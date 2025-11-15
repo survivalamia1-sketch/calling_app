@@ -30,10 +30,17 @@ class SubscriptionsRemoteDataSourceImpl
       final response = await client.get(ApiConstants.subscriptionsPlans);
 
       if (response.statusCode == 200) {
-        // Backend returns array directly, but PowerShell might wrap it in 'value'
-        final List<dynamic> data = response.data['value'] ??
-            response.data['plans'] ??
-            (response.data is List ? response.data : []);
+        // Backend returns array directly, not wrapped
+        final List<dynamic> data;
+        if (response.data is List) {
+          data = response.data as List<dynamic>;
+        } else if (response.data is Map && response.data['plans'] != null) {
+          data = response.data['plans'] as List<dynamic>;
+        } else if (response.data is Map && response.data['value'] != null) {
+          data = response.data['value'] as List<dynamic>;
+        } else {
+          data = [];
+        }
         return data
             .map((json) => SubscriptionPlanModel.fromJson(json))
             .toList();
