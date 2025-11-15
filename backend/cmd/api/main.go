@@ -60,6 +60,7 @@ func main() {
 	router := gin.Default()
 
 	// Middleware
+	router.Use(middleware.RequestLogger()) // Log auth requests/responses for debugging
 	router.Use(middleware.CORSMiddleware(cfg))
 	router.Use(middleware.RecoveryMiddleware())
 	router.Use(middleware.ErrorHandler())
