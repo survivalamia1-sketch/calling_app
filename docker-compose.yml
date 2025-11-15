@@ -53,12 +53,19 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
-      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      # TurboSMTP Email Configuration
+      - SMTP_HOST=${SMTP_HOST:-pro.turbo-smtp.com}
       - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_FROM=${SMTP_FROM:-noreply@videocall.com}
+      - SMTP_USERNAME=${SMTP_USERNAME:-}
       - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM=${SMTP_FROM:-noreply@videocall.com}
+      - SMTP_USE_SSL=${SMTP_USE_SSL:-false}
+      - SMTP_USE_TLS=${SMTP_USE_TLS:-true}
+      - SMTP_SKIP_VERIFY=${SMTP_SKIP_VERIFY:-false}
+      # Stripe Configuration
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      # Application URLs
       - APP_URL=${APP_URL:-http://localhost:3000}
       - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:3001}
     ports:

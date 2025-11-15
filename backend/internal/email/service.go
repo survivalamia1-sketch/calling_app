@@ -2,27 +2,41 @@ package email
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"html/template"
 	"net/smtp"
 	"os"
+	"strconv"
 )
 
 type Service struct {
-	from     string
-	password string
-	smtpHost string
-	smtpPort string
-	appURL   string
+	from       string
+	username   string
+	password   string
+	smtpHost   string
+	smtpPort   string
+	appURL     string
+	useSSL     bool
+	useTLS     bool
+	skipVerify bool
 }
 
 func NewService() *Service {
+	useSSL, _ := strconv.ParseBool(getEnv("SMTP_USE_SSL", "false"))
+	useTLS, _ := strconv.ParseBool(getEnv("SMTP_USE_TLS", "true"))
+	skipVerify, _ := strconv.ParseBool(getEnv("SMTP_SKIP_VERIFY", "false"))
+
 	return &Service{
-		from:     getEnv("SMTP_FROM", "noreply@videocall.com"),
-		password: getEnv("SMTP_PASSWORD", ""),
-		smtpHost: getEnv("SMTP_HOST", "smtp.gmail.com"),
-		smtpPort: getEnv("SMTP_PORT", "587"),
-		appURL:   getEnv("APP_URL", "http://localhost:3000"),
+		from:       getEnv("SMTP_FROM", "noreply@videocall.com"),
+		username:   getEnv("SMTP_USERNAME", getEnv("SMTP_FROM", "noreply@videocall.com")),
+		password:   getEnv("SMTP_PASSWORD", ""),
+		smtpHost:   getEnv("SMTP_HOST", "pro.turbo-smtp.com"),
+		smtpPort:   getEnv("SMTP_PORT", "587"),
+		appURL:     getEnv("APP_URL", "http://localhost:3000"),
+		useSSL:     useSSL,
+		useTLS:     useTLS,
+		skipVerify: skipVerify,
 	}
 }
 
@@ -220,8 +234,6 @@ func (s *Service) sendEmail(to, subject, body string) error {
 		return nil
 	}
 
-	auth := smtp.PlainAuth("", s.from, s.password, s.smtpHost)
-
 	headers := fmt.Sprintf("From: %s\r\n"+
 		"To: %s\r\n"+
 		"Subject: %s\r\n"+
@@ -230,7 +242,129 @@ func (s *Service) sendEmail(to, subject, body string) error {
 		s.from, to, subject)
 
 	message := []byte(headers + body)
-
 	addr := fmt.Sprintf("%s:%s", s.smtpHost, s.smtpPort)
+
+	// Use SSL connection for ports 465, 25025
+	if s.useSSL || s.smtpPort == "465" || s.smtpPort == "25025" {
+		return s.sendEmailSSL(addr, to, message)
+	}
+
+	// Use TLS/STARTTLS for ports 587, 25, 2525
+	return s.sendEmailTLS(addr, to, message)
+}
+
+// sendEmailSSL sends email using SSL/TLS connection (for ports 465, 25025)
+func (s *Service) sendEmailSSL(addr, to string, message []byte) error {
+	auth := smtp.PlainAuth("", s.username, s.password, s.smtpHost)
+
+	tlsConfig := &tls.Config{
+		ServerName:         s.smtpHost,
+		InsecureSkipVerify: s.skipVerify,
+	}
+
+	// Connect to SMTP server with TLS
+	conn, err := tls.Dial("tcp", addr, tlsConfig)
+	if err != nil {
+		return fmt.Errorf("failed to connect to SMTP server: %w", err)
+	}
+	defer conn.Close()
+
+	// Create SMTP client
+	client, err := smtp.NewClient(conn, s.smtpHost)
+	if err != nil {
+		return fmt.Errorf("failed to create SMTP client: %w", err)
+	}
+	defer client.Close()
+
+	// Authenticate
+	if err = client.Auth(auth); err != nil {
+		return fmt.Errorf("SMTP authentication failed: %w", err)
+	}
+
+	// Set sender
+	if err = client.Mail(s.from); err != nil {
+		return fmt.Errorf("failed to set sender: %w", err)
+	}
+
+	// Set recipient
+	if err = client.Rcpt(to); err != nil {
+		return fmt.Errorf("failed to set recipient: %w", err)
+	}
+
+	// Send message
+	w, err := client.Data()
+	if err != nil {
+		return fmt.Errorf("failed to get data writer: %w", err)
+	}
+
+	_, err = w.Write(message)
+	if err != nil {
+		return fmt.Errorf("failed to write message: %w", err)
+	}
+
+	if err = w.Close(); err != nil {
+		return fmt.Errorf("failed to close data writer: %w", err)
+	}
+
+	return client.Quit()
+}
+
+// sendEmailTLS sends email using STARTTLS (for ports 587, 25, 2525)
+func (s *Service) sendEmailTLS(addr, to string, message []byte) error {
+	auth := smtp.PlainAuth("", s.username, s.password, s.smtpHost)
+
+	if s.useTLS {
+		// Use custom TLS configuration with STARTTLS
+		tlsConfig := &tls.Config{
+			ServerName:         s.smtpHost,
+			InsecureSkipVerify: s.skipVerify,
+		}
+
+		// Connect to SMTP server
+		conn, err := smtp.Dial(addr)
+		if err != nil {
+			return fmt.Errorf("failed to connect to SMTP server: %w", err)
+		}
+		defer conn.Close()
+
+		// Send STARTTLS command
+		if err = conn.StartTLS(tlsConfig); err != nil {
+			return fmt.Errorf("STARTTLS failed: %w", err)
+		}
+
+		// Authenticate
+		if err = conn.Auth(auth); err != nil {
+			return fmt.Errorf("SMTP authentication failed: %w", err)
+		}
+
+		// Set sender
+		if err = conn.Mail(s.from); err != nil {
+			return fmt.Errorf("failed to set sender: %w", err)
+		}
+
+		// Set recipient
+		if err = conn.Rcpt(to); err != nil {
+			return fmt.Errorf("failed to set recipient: %w", err)
+		}
+
+		// Send message
+		w, err := conn.Data()
+		if err != nil {
+			return fmt.Errorf("failed to get data writer: %w", err)
+		}
+
+		_, err = w.Write(message)
+		if err != nil {
+			return fmt.Errorf("failed to write message: %w", err)
+		}
+
+		if err = w.Close(); err != nil {
+			return fmt.Errorf("failed to close data writer: %w", err)
+		}
+
+		return conn.Quit()
+	}
+
+	// Fallback to simple SendMail (no TLS)
 	return smtp.SendMail(addr, auth, s.from, []string{to}, message)
 }
