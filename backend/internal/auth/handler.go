@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 	"github.com/yourusername/calling-app-backend/internal/middleware"
 	"github.com/yourusername/calling-app-backend/pkg/config"
 	"github.com/yourusername/calling-app-backend/pkg/utils"

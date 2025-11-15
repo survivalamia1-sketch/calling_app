@@ -27,7 +27,7 @@ type CreateRoomInput struct {
 	ScheduledAt      *time.Time `json:"scheduled_at"`
 }
 
-type JoinRoomInput struct{
+type JoinRoomInput struct {
 	Password string `json:"password"`
 	Name     string `json:"name"` // For guest users
 }
@@ -324,11 +324,11 @@ func (s *Service) GetRoomStatus(roomID uuid.UUID) (map[string]interface{}, error
 	}
 
 	status := map[string]interface{}{
-		"room_id":     room.ID,
-		"status":      room.Status,
-		"started_at":  room.StartedAt,
-		"ended_at":    room.EndedAt,
-		"duration":    room.Duration,
+		"room_id":    room.ID,
+		"status":     room.Status,
+		"started_at": room.StartedAt,
+		"ended_at":   room.EndedAt,
+		"duration":   room.Duration,
 	}
 
 	// Add remaining time if room is active

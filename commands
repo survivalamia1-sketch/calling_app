@@ -1,0 +1,73 @@
+Commands to run the backend server:
+
+## Start the Backend Server
+
+**Start all services (PostgreSQL, Redis, API):**
+```bash
+cd E:\D\Portfolio\calling_app\backend
+docker-compose up -d
+```
+
+**Start only the API service:**
+```bash
+cd E:\D\Portfolio\calling_app\backend
+docker-compose up -d api
+```
+
+## Run Database Migrations
+
+**After starting the services, run migrations:**
+```bash
+cd E:\D\Portfolio\calling_app\backend
+docker-compose exec api ./main migrate
+```
+
+## Useful Management Commands
+
+**View server logs:**
+```bash
+docker-compose logs -f api
+```
+
+**Restart the server:**
+```bash
+docker-compose restart api
+```
+
+**Stop the server:**
+```bash
+docker-compose stop api
+```
+
+**Stop all services:**
+```bash
+docker-compose down
+```
+
+**Check server status:**
+```bash
+docker-compose ps
+```
+
+**Rebuild and restart (after code changes):**
+```bash
+docker-compose up -d --build api
+```
+
+## Quick Start (Complete Setup)
+
+```bash
+# Navigate to backend directory
+cd E:\D\Portfolio\calling_app\backend
+
+# Start all services
+docker-compose up -d
+
+# Run migrations
+docker-compose exec api ./main migrate
+
+# View logs to confirm it's running
+docker-compose logs -f api
+```
+
+The server will be available at `http://localhost:8080` once started.

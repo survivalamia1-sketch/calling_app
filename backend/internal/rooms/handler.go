@@ -41,7 +41,7 @@ func (h *Handler) CreateRoom(c *gin.Context) {
 	var input CreateRoomInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid input",
+			"error":   "Invalid input",
 			"details": err.Error(),
 		})
 		return
@@ -316,6 +316,13 @@ func (h *Handler) GetRoomParticipants(c *gin.Context) {
 // @Router /rooms/{id}/status [get]
 func (h *Handler) GetRoomStatus(c *gin.Context) {
 	roomIDStr := c.Param("id")
+	if roomIDStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Room ID is required",
+		})
+		return
+	}
+
 	roomID, err := uuid.Parse(roomIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

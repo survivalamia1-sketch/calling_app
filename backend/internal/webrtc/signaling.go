@@ -4,10 +4,11 @@ import (
 	"log"
 	"sync"
 
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"net/http"
 )
 
 type Message struct {
@@ -287,12 +288,6 @@ func (h *Hub) BroadcastToRoom(roomID uuid.UUID, messageType string, data interfa
 
 	room.mu.RLock()
 	defer room.mu.RUnlock()
-
-	message := &Message{
-		Type:    messageType,
-		RoomID:  roomID.String(),
-		Payload: data,
-	}
 
 	// Send to all clients in the room
 	for client := range room.Clients {

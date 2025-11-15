@@ -126,10 +126,11 @@ func main() {
 		roomRoutes := v1.Group("/rooms")
 		{
 			// Public/semi-public routes
-			roomRoutes.GET("/:id", roomsHandler.GetRoom)
+			// More specific routes must come first in Gin
 			roomRoutes.GET("/:id/participants", roomsHandler.GetRoomParticipants)
 			roomRoutes.GET("/:id/status", roomsHandler.GetRoomStatus)
 			roomRoutes.GET("/:id/info", webrtc.GetRoomInfoHandler(webrtcHub))
+			roomRoutes.GET("/:id", roomsHandler.GetRoom)
 
 			// Join room (can be authenticated or guest)
 			roomRoutes.POST("/:id/join", middleware.OptionalAuthMiddleware(cfg), roomsHandler.JoinRoom)
