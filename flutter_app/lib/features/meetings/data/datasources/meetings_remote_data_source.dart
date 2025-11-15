@@ -125,19 +125,28 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
     bool? requiresApproval,
   }) async {
     try {
+      // Prepare the request data - only include non-null/non-empty values
+      final requestData = <String, dynamic>{
+        'name': title, // Backend expects 'name', not 'title'
+        'description': description,
+      };
+
+      // Only add scheduled_at if it's not the same as current time (i.e., it's actually scheduled)
+      // Format as RFC3339 which is what Go expects
+      requestData['scheduled_at'] = scheduledAt.toUtc().toIso8601String();
+
+      // Optional fields
+      if (maxParticipants != null && maxParticipants > 0) {
+        requestData['max_participants'] = maxParticipants;
+      }
+
+      if (requiresApproval != null) {
+        requestData['has_waiting_room'] = requiresApproval;
+      }
+
       final response = await client.post(
         ApiConstants.rooms,
-        data: {
-          'name': title, // Backend expects 'name', not 'title'
-          'description': description,
-          'scheduled_at': scheduledAt.toIso8601String(),
-          if (maxParticipants != null) 'max_participants': maxParticipants,
-          if (requiresApproval != null)
-            'has_waiting_room':
-                requiresApproval, // Backend uses 'has_waiting_room'
-          'is_password_locked': false, // Default
-          'password': '', // Default empty
-        },
+        data: requestData,
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
@@ -151,8 +160,12 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
         throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 400) {
-        throw ServerException(
-            message: e.response?.data['message'] ?? 'Invalid meeting data');
+        // Extract more detailed error message from backend
+        final errorMsg = e.response?.data['error'] ??
+                        e.response?.data['message'] ??
+                        e.response?.data.toString() ??
+                        'Invalid meeting data';
+        throw ServerException(message: errorMsg);
       }
       throw ServerException(message: e.message ?? 'Network error');
     }
