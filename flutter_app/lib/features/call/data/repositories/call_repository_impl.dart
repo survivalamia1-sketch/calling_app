@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/call.dart';
 import '../../domain/repositories/call_repository.dart';
@@ -33,15 +35,7 @@ class CallRepositoryImpl implements CallRepository {
   Future<Either<Failure, Unit>> initialize() async {
     try {
       await webrtcService.initialize();
-
-      // Get auth token for signaling
-      final token = await storage.read(key: 'auth_token');
-      if (token == null) {
-        return const Left(UnauthorizedFailure(message: 'Not authenticated'));
-      }
-
-      await signalingService.connect(token);
-
+      // Note: WebSocket connection happens in joinCall() with room_id and user_id
       return const Right(unit);
     } catch (e) {
       return Left(ServerFailure(message: 'Failed to initialize call: $e'));
@@ -51,8 +45,20 @@ class CallRepositoryImpl implements CallRepository {
   @override
   Future<Either<Failure, Call>> joinCall(String roomId) async {
     try {
-      // Get user ID from storage (assuming it's stored)
-      final userId = await storage.read(key: 'user_id') ?? 'anonymous';
+      // Get user ID from cached user data
+      final userDataJson = await storage.read(key: AppConstants.userDataKey);
+      if (userDataJson == null) {
+        return const Left(UnauthorizedFailure(message: 'User not authenticated'));
+      }
+
+      final userData = jsonDecode(userDataJson) as Map<String, dynamic>;
+      final userId = userData['id'] as String;
+
+      // Connect to signaling server with room and user IDs
+      await signalingService.connect(
+        roomId: roomId,
+        userId: userId,
+      );
 
       // Create local media stream
       await webrtcService.createLocalStream(audio: true, video: true);
@@ -224,9 +230,13 @@ class CallRepositoryImpl implements CallRepository {
         return const Right(unit);
       }
 
-      // Leave room via signaling
-      final userId = await storage.read(key: 'user_id') ?? 'anonymous';
-      signalingService.leaveRoom(_currentCall!.roomId, userId);
+      // Get user ID from cached user data
+      final userDataJson = await storage.read(key: AppConstants.userDataKey);
+      if (userDataJson != null) {
+        final userData = jsonDecode(userDataJson) as Map<String, dynamic>;
+        final userId = userData['id'] as String;
+        signalingService.leaveRoom(_currentCall!.roomId, userId);
+      }
 
       // Update call status
       _currentCall = _currentCall!.copyWith(

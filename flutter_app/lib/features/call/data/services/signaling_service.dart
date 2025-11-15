@@ -58,7 +58,10 @@ class SignalingService {
   SignalingState get currentState => _currentState;
 
   /// Connect to signaling server
-  Future<void> connect(String token) async {
+  Future<void> connect({
+    required String roomId,
+    required String userId,
+  }) async {
     if (_currentState == SignalingState.connected) {
       return; // Already connected
     }
@@ -72,7 +75,7 @@ class SignalingService {
           .replaceFirst('https://', 'wss://');
 
       _channel = WebSocketChannel.connect(
-        Uri.parse('$wsUrl/ws?token=$token'),
+        Uri.parse('$wsUrl/ws?room_id=$roomId&user_id=$userId'),
       );
 
       _channel!.stream.listen(
