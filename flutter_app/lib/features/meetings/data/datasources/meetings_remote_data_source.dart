@@ -100,24 +100,10 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
 
   @override
   Future<MeetingModel> getMeetingByCode(String code) async {
-    try {
-      final response = await client.get(
-        ApiConstants.roomsJoinByCode,
-        queryParameters: {'code': code},
-      );
-
-      if (response.statusCode == 200) {
-        return MeetingModel.fromJson(response.data['room']);
-      } else {
-        throw const ServerException(message: 'Failed to find meeting');
-      }
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 404) {
-        throw const ServerException(
-            message: 'Meeting not found with this code');
-      }
-      throw ServerException(message: e.message ?? 'Network error');
-    }
+    // Note: Join by code endpoint not available in backend
+    // Using room ID lookup instead - code should be converted to room ID
+    throw const ServerException(
+        message: 'Join by code not implemented. Use room ID instead.');
   }
 
   @override

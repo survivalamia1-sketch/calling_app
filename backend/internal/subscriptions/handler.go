@@ -1,6 +1,7 @@
 package subscriptions
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -187,7 +188,7 @@ func (h *Handler) HandleWebhook(c *gin.Context) {
 	switch event.Type {
 	case "checkout.session.completed":
 		var session stripe.CheckoutSession
-		err := stripe.UnmarshalJSON(event.Data.Raw, &session)
+		err := json.Unmarshal(event.Data.Raw, &session)
 		if err != nil {
 			log.Printf("Error parsing webhook JSON: %v\n", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -201,7 +202,7 @@ func (h *Handler) HandleWebhook(c *gin.Context) {
 
 	case "customer.subscription.updated":
 		var sub stripe.Subscription
-		err := stripe.UnmarshalJSON(event.Data.Raw, &sub)
+		err := json.Unmarshal(event.Data.Raw, &sub)
 		if err != nil {
 			log.Printf("Error parsing webhook JSON: %v\n", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -215,7 +216,7 @@ func (h *Handler) HandleWebhook(c *gin.Context) {
 
 	case "customer.subscription.deleted":
 		var sub stripe.Subscription
-		err := stripe.UnmarshalJSON(event.Data.Raw, &sub)
+		err := json.Unmarshal(event.Data.Raw, &sub)
 		if err != nil {
 			log.Printf("Error parsing webhook JSON: %v\n", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

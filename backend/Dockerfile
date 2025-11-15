@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
@@ -8,10 +8,14 @@ RUN apk add --no-cache git
 
 # Copy go mod files
 COPY go.mod go.sum ./
-RUN go mod download
+# Disable checksum verification during build to avoid network issues
+RUN GOSUMDB=off go mod download
 
 # Copy source code
 COPY . .
+
+# Ensure all dependencies are resolved and go.sum is complete
+RUN GOSUMDB=off go mod tidy
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./cmd/api

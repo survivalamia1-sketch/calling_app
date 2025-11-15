@@ -121,7 +121,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> getCurrentUser() async {
     try {
-      final response = await client.get(ApiConstants.authMe);
+      final response = await client.get(ApiConstants.authProfile);
 
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data['user']);
@@ -176,15 +176,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> resendVerificationEmail() async {
-    try {
-      final response = await client.post(ApiConstants.authResendVerification);
-
-      if (response.statusCode != 200) {
-        throw const ServerException(message: 'Failed to resend verification');
-      }
-    } on DioException catch (e) {
-      throw ServerException(message: e.message ?? 'Network error');
-    }
+    // Note: Resend verification endpoint not available in backend
+    throw const ServerException(message: 'Resend verification not implemented');
   }
 
   @override
@@ -217,7 +210,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> updateProfile(Map<String, dynamic> updates) async {
     try {
       final response = await client.put(
-        ApiConstants.usersMe,
+        ApiConstants.authProfile,
         data: updates,
       );
 

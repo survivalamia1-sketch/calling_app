@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/yourusername/calling-app-backend/internal/middleware"
 	"github.com/yourusername/calling-app-backend/pkg/config"
 	"github.com/yourusername/calling-app-backend/pkg/utils"

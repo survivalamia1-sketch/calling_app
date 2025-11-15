@@ -45,7 +45,7 @@ class SubscriptionsRemoteDataSourceImpl
   @override
   Future<UserSubscriptionModel> getCurrentSubscription() async {
     try {
-      final response = await client.get(ApiConstants.subscriptionsMe);
+      final response = await client.get(ApiConstants.subscriptionsCurrent);
 
       if (response.statusCode == 200) {
         return UserSubscriptionModel.fromJson(response.data['subscription']);
@@ -113,11 +113,11 @@ class SubscriptionsRemoteDataSourceImpl
     required String billingCycle,
   }) async {
     try {
-      final response = await client.put(
-        ApiConstants.subscriptionsMe,
+      // Note: Direct subscription update not available - use checkout endpoint
+      final response = await client.post(
+        ApiConstants.subscriptionsCheckout,
         data: {
           'plan_id': planId,
-          'billing_cycle': billingCycle,
         },
       );
 

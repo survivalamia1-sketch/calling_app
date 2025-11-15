@@ -2,13 +2,11 @@ package admin
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/yourusername/calling-app-backend/internal/models"
 	"github.com/yourusername/calling-app-backend/pkg/database"
-	"gorm.io/gorm"
 )
 
 type AdminService struct{}
