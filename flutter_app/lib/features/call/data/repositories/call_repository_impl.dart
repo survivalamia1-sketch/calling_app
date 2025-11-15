@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/call.dart';
@@ -17,6 +19,7 @@ class CallRepositoryImpl implements CallRepository {
   final WebRTCService webrtcService;
   final SignalingService signalingService;
   final FlutterSecureStorage storage;
+  final Dio dio;
 
   Call? _currentCall;
   final StreamController<Call> _callController =
@@ -26,6 +29,7 @@ class CallRepositoryImpl implements CallRepository {
     required this.webrtcService,
     required this.signalingService,
     required this.storage,
+    required this.dio,
   });
 
   @override
@@ -53,6 +57,19 @@ class CallRepositoryImpl implements CallRepository {
 
       final userData = jsonDecode(userDataJson) as Map<String, dynamic>;
       final userId = userData['id'] as String;
+
+      // Call HTTP API to join room (this starts the room and duration timer)
+      try {
+        await dio.post(
+          ApiConstants.roomJoin(roomId),
+          data: {
+            'name': '${userData['first_name']} ${userData['last_name']}',
+          },
+        );
+      } catch (e) {
+        log('Failed to call join room API: $e');
+        // Continue anyway - the room might already be started
+      }
 
       // Connect to signaling server with room and user IDs
       await signalingService.connect(
