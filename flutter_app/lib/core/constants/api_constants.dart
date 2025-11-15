@@ -1,13 +1,20 @@
 class ApiConstants {
-  static const String apiBaseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:8080/api/v1',
-  );
+  // Use localhost for all platforms - browsers handle it correctly
+  static String get apiBaseUrl {
+    const envUrl = String.fromEnvironment('API_BASE_URL');
+    if (envUrl.isNotEmpty) {
+      return envUrl;
+    }
+    return 'http://localhost:8080/api/v1';
+  }
 
-  static const String wsUrl = String.fromEnvironment(
-    'WS_URL',
-    defaultValue: 'ws://localhost:8080/api/v1/ws',
-  );
+  static String get wsUrl {
+    const envUrl = String.fromEnvironment('WS_URL');
+    if (envUrl.isNotEmpty) {
+      return envUrl;
+    }
+    return 'ws://localhost:8080/api/v1/ws';
+  }
 
   // Endpoints
   static const String authLogin = '/auth/login';

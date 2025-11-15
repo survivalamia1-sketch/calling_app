@@ -69,13 +69,11 @@ class SignalingService {
     try {
       _updateState(SignalingState.connecting);
 
-      // Get WebSocket URL from API base URL
-      final wsUrl = ApiConstants.apiBaseUrl
-          .replaceFirst('http://', 'ws://')
-          .replaceFirst('https://', 'wss://');
+      // Use WebSocket URL from constants
+      final wsUrl = ApiConstants.wsUrl;
 
       _channel = WebSocketChannel.connect(
-        Uri.parse('$wsUrl/ws?room_id=$roomId&user_id=$userId'),
+        Uri.parse('$wsUrl?room_id=$roomId&user_id=$userId'),
       );
 
       _channel!.stream.listen(

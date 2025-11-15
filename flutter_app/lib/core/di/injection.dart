@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
@@ -74,9 +75,18 @@ final getIt = GetIt.instance;
 
 Future<void> configureDependencies() async {
   // Core
-  getIt.registerLazySingleton(() => InternetConnectionChecker());
+  // Only register InternetConnectionChecker on non-web platforms
+  if (!kIsWeb) {
+    getIt.registerLazySingleton(() => InternetConnectionChecker());
+  }
   getIt.registerLazySingleton<NetworkInfo>(
-    () => NetworkInfoImpl(getIt()),
+    () {
+      if (kIsWeb) {
+        return NetworkInfoImpl(null);
+      } else {
+        return NetworkInfoImpl(getIt<InternetConnectionChecker>());
+      }
+    },
   );
 
   // External
@@ -100,8 +110,8 @@ Future<void> configureDependencies() async {
               options.method,
               options.uri.toString(),
               data: options.data is Map<String, dynamic>
-                ? options.data as Map<String, dynamic>
-                : null,
+                  ? options.data as Map<String, dynamic>
+                  : null,
             );
             return handler.next(options);
           },

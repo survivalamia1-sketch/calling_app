@@ -16,23 +16,36 @@ func CORSMiddleware(cfg *config.Config) gin.HandlerFunc {
 		allowedOrigins := strings.Split(cfg.CORS.AllowedOrigins, ",")
 		allowed := false
 
-		for _, allowedOrigin := range allowedOrigins {
-			allowedOrigin = strings.TrimSpace(allowedOrigin)
-			if allowedOrigin == "*" || allowedOrigin == origin {
-				allowed = true
-				break
+		// If "*" is configured, allow all origins
+		if cfg.CORS.AllowedOrigins == "*" {
+			allowed = true
+		} else {
+			for _, allowedOrigin := range allowedOrigins {
+				allowedOrigin = strings.TrimSpace(allowedOrigin)
+				if allowedOrigin == origin {
+					allowed = true
+					break
+				}
 			}
 		}
 
 		if allowed {
-			if origin != "" {
+			if cfg.CORS.AllowedOrigins == "*" {
+				// For "*", always use the request origin (required when credentials are enabled)
+				// If no origin header, allow all (for non-browser clients)
+				if origin != "" {
+					c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+					c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+				} else {
+					// No origin header - this is likely a non-browser client, allow all
+					c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+					// Can't use credentials with "*"
+				}
+			} else if origin != "" {
 				c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
-			} else if cfg.CORS.AllowedOrigins == "*" {
-				c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+				c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 			}
 		}
-
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
 

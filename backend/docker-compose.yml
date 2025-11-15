@@ -63,7 +63,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
       - SMTP_FROM_NAME=Calling App
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
+      - CORS_ALLOWED_ORIGINS=*
     depends_on:
       postgres:
         condition: service_healthy
