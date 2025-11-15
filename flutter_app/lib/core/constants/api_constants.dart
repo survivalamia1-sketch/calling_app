@@ -23,6 +23,7 @@ class ApiConstants {
   static String roomJoin(String id) => '/rooms/$id/join';
   static String roomParticipants(String id) => '/rooms/$id/participants';
   static String roomInfo(String id) => '/rooms/$id/info';
+  static String roomStatus(String id) => '/rooms/$id/status';
   static String roomLeave(String id) => '/rooms/$id/leave';
   static String roomEnd(String id) => '/rooms/$id/end';
 

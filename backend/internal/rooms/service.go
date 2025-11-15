@@ -178,6 +178,19 @@ func (s *Service) JoinRoom(roomID, userID uuid.UUID, input JoinRoomInput) (*mode
 	if room.Status == models.RoomStatusWaiting || room.Status == models.RoomStatusScheduled {
 		room.Start()
 		db.Save(&room)
+
+		// Start duration timer for the room based on host's subscription
+		var host models.User
+		if err := db.Preload("Subscription.Plan").First(&host, room.HostID).Error; err == nil {
+			maxDuration := 45 // Default for free tier (in minutes)
+
+			if host.Subscription != nil {
+				maxDuration = host.Subscription.GetMaxMeetingDuration()
+			}
+
+			// Start timer (0 = unlimited for paid plans)
+			GetDurationManager().StartTimer(room.ID, maxDuration)
+		}
 	}
 
 	// Load user relationship
@@ -214,6 +227,9 @@ func (s *Service) LeaveRoom(roomID, userID uuid.UUID) error {
 		if err := db.First(&room, roomID).Error; err == nil {
 			room.End()
 			db.Save(&room)
+
+			// Stop duration timer
+			GetDurationManager().StopTimer(roomID)
 		}
 	}
 
@@ -249,6 +265,9 @@ func (s *Service) EndRoom(roomID, hostID uuid.UUID) error {
 	if err := db.Save(&room).Error; err != nil {
 		return fmt.Errorf("failed to end room: %w", err)
 	}
+
+	// Stop duration timer
+	GetDurationManager().StopTimer(roomID)
 
 	return nil
 }
@@ -290,4 +309,43 @@ func (s *Service) GetRoomParticipants(roomID uuid.UUID) ([]models.RoomParticipan
 	}
 
 	return participants, nil
+}
+
+// GetRoomStatus gets the status of a room including remaining time
+func (s *Service) GetRoomStatus(roomID uuid.UUID) (map[string]interface{}, error) {
+	db := database.GetDB()
+
+	var room models.Room
+	if err := db.Preload("Host.Subscription.Plan").First(&room, roomID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("room not found")
+		}
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	status := map[string]interface{}{
+		"room_id":     room.ID,
+		"status":      room.Status,
+		"started_at":  room.StartedAt,
+		"ended_at":    room.EndedAt,
+		"duration":    room.Duration,
+	}
+
+	// Add remaining time if room is active
+	if room.Status == models.RoomStatusActive {
+		remainingSeconds := GetDurationManager().GetRemainingTime(roomID)
+		status["remaining_seconds"] = remainingSeconds
+
+		// Check if there's a time limit
+		if room.Host != nil && room.Host.Subscription != nil {
+			maxDuration := room.Host.Subscription.GetMaxMeetingDuration()
+			status["max_duration_minutes"] = maxDuration
+			status["has_time_limit"] = maxDuration > 0
+		} else {
+			status["max_duration_minutes"] = 45 // Free tier default
+			status["has_time_limit"] = true
+		}
+	}
+
+	return status, nil
 }

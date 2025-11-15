@@ -5,7 +5,9 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 class WebRTCService {
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
+  MediaStream? _screenStream;
   final Map<String, MediaStream> _remoteStreams = {};
+  bool _isScreenSharing = false;
 
   final StreamController<MediaStream> _localStreamController =
       StreamController<MediaStream>.broadcast();
@@ -18,6 +20,7 @@ class WebRTCService {
 
   MediaStream? get currentLocalStream => _localStream;
   Map<String, MediaStream> get currentRemoteStreams => _remoteStreams;
+  bool get isScreenSharing => _isScreenSharing;
 
   /// Initialize WebRTC with ICE servers
   Future<void> initialize() async {
@@ -187,6 +190,99 @@ class WebRTCService {
     }
   }
 
+  /// Start screen sharing
+  Future<MediaStream?> startScreenShare() async {
+    if (_peerConnection == null || _isScreenSharing) {
+      return null;
+    }
+
+    try {
+      // Request screen sharing stream
+      final mediaConstraints = {
+        'audio': false,
+        'video': true,
+      };
+
+      _screenStream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+
+      if (_screenStream != null) {
+        // Remove existing video tracks from peer connection
+        final senders = await _peerConnection!.getSenders();
+        for (var sender in senders) {
+          if (sender.track?.kind == 'video') {
+            await _peerConnection!.removeTrack(sender);
+          }
+        }
+
+        // Add screen share video track
+        final screenVideoTracks = _screenStream!.getVideoTracks();
+        if (screenVideoTracks.isNotEmpty) {
+          await _peerConnection!.addTrack(
+            screenVideoTracks[0],
+            _screenStream!,
+          );
+
+          // Listen for when user stops sharing via browser UI
+          screenVideoTracks[0].onEnded = () {
+            stopScreenShare();
+          };
+        }
+
+        _isScreenSharing = true;
+
+        // Update local stream controller to show screen share
+        _localStreamController.add(_screenStream!);
+      }
+
+      return _screenStream;
+    } catch (e) {
+      print('Error starting screen share: $e');
+      return null;
+    }
+  }
+
+  /// Stop screen sharing
+  Future<void> stopScreenShare() async {
+    if (!_isScreenSharing || _peerConnection == null) {
+      return;
+    }
+
+    try {
+      // Remove screen share tracks from peer connection
+      final senders = await _peerConnection!.getSenders();
+      for (var sender in senders) {
+        if (sender.track?.kind == 'video') {
+          await _peerConnection!.removeTrack(sender);
+        }
+      }
+
+      // Stop and dispose screen stream
+      _screenStream?.getTracks().forEach((track) {
+        track.stop();
+      });
+      await _screenStream?.dispose();
+      _screenStream = null;
+
+      // Re-add camera video track
+      if (_localStream != null) {
+        final videoTracks = _localStream!.getVideoTracks();
+        if (videoTracks.isNotEmpty) {
+          await _peerConnection!.addTrack(
+            videoTracks[0],
+            _localStream!,
+          );
+        }
+
+        // Update local stream controller to show camera again
+        _localStreamController.add(_localStream!);
+      }
+
+      _isScreenSharing = false;
+    } catch (e) {
+      print('Error stopping screen share: $e');
+    }
+  }
+
   /// Close and cleanup resources
   Future<void> dispose() async {
     // Close streams
@@ -195,6 +291,13 @@ class WebRTCService {
     });
     await _localStream?.dispose();
     _localStream = null;
+
+    // Close screen stream
+    _screenStream?.getTracks().forEach((track) {
+      track.stop();
+    });
+    await _screenStream?.dispose();
+    _screenStream = null;
 
     for (var stream in _remoteStreams.values) {
       stream.getTracks().forEach((track) {
@@ -207,6 +310,9 @@ class WebRTCService {
     // Close peer connection
     await _peerConnection?.close();
     _peerConnection = null;
+
+    // Reset screen sharing flag
+    _isScreenSharing = false;
 
     // Close stream controllers
     await _localStreamController.close();

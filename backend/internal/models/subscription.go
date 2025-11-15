@@ -32,6 +32,7 @@ type SubscriptionPlan struct {
 	Description         string    `json:"description"`
 	Price               int       `json:"price"` // in cents
 	Currency            string    `gorm:"default:'usd'" json:"currency"`
+	BillingPeriod       string    `gorm:"default:'monthly'" json:"billing_period"` // monthly, yearly, or empty for free
 	StripePriceID       string    `json:"stripe_price_id"`
 	MaxMeetingDuration  int       `json:"max_meeting_duration"`  // in minutes (0 = unlimited)
 	MaxParticipants     int       `json:"max_participants"`

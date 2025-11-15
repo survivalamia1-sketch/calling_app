@@ -52,6 +52,9 @@ func main() {
 	webrtcHub := webrtc.NewHub()
 	go webrtcHub.Run()
 
+	// Connect duration manager to signaling hub
+	rooms.GetDurationManager().SetSignalingHub(webrtcHub)
+
 	// Setup Gin
 	if cfg.Server.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -125,6 +128,7 @@ func main() {
 			// Public/semi-public routes
 			roomRoutes.GET("/:id", roomsHandler.GetRoom)
 			roomRoutes.GET("/:id/participants", roomsHandler.GetRoomParticipants)
+			roomRoutes.GET("/:id/status", roomsHandler.GetRoomStatus)
 			roomRoutes.GET("/:id/info", webrtc.GetRoomInfoHandler(webrtcHub))
 
 			// Join room (can be authenticated or guest)

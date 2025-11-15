@@ -1,8 +1,14 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/api_constants.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/utils/app_logger.dart';
 import '../../../../core/utils/permissions_helper.dart';
 import '../../domain/entities/call.dart';
 import '../bloc/call_bloc.dart';
@@ -20,13 +26,120 @@ class CallPage extends StatefulWidget {
 }
 
 class _CallPageState extends State<CallPage> {
+  Timer? _statusTimer;
+  int? _remainingSeconds;
+  bool _hasTimeLimit = false;
+  bool _warningShown = false;
+
   @override
   void initState() {
     super.initState();
     // Request permissions and join call when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _requestPermissionsAndJoinCall();
+      _startStatusPolling();
     });
+  }
+
+  @override
+  void dispose() {
+    _statusTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startStatusPolling() {
+    // Poll room status every 30 seconds
+    _statusTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _fetchRoomStatus();
+    });
+
+    // Fetch immediately
+    _fetchRoomStatus();
+  }
+
+  Future<void> _fetchRoomStatus() async {
+    try {
+      final dio = getIt<Dio>();
+      final response = await dio.get(ApiConstants.roomStatus(widget.roomId));
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+
+        setState(() {
+          _remainingSeconds = data['remaining_seconds'] as int?;
+          _hasTimeLimit = data['has_time_limit'] as bool? ?? false;
+        });
+
+        // Show warning if less than 5 minutes remaining
+        if (_remainingSeconds != null &&
+            _remainingSeconds! > 0 &&
+            _remainingSeconds! <= 300 &&
+            !_warningShown) {
+          _showTimeWarning(_remainingSeconds!);
+          _warningShown = true;
+        }
+
+        // Auto-end if time is up
+        if (_remainingSeconds != null && _remainingSeconds! <= 0) {
+          _showTimeUpDialog();
+        }
+      }
+    } catch (e) {
+      AppLogger.w('Failed to fetch room status: $e');
+    }
+  }
+
+  void _showTimeWarning(int seconds) {
+    final minutes = (seconds / 60).ceil();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'This call will end in $minutes ${minutes == 1 ? 'minute' : 'minutes'} due to plan limits',
+        ),
+        backgroundColor: Colors.orange,
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: 'Upgrade',
+          textColor: Colors.white,
+          onPressed: () {
+            // Navigate to subscription page
+            context.push('/subscriptions');
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showTimeUpDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Call Time Limit Reached'),
+        content: const Text(
+          'This call has reached the maximum duration for your plan. '
+          'Upgrade to Pro for unlimited call duration!',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<CallBloc>().add(const CallEvent.leaveCall());
+            },
+            child: const Text('End Call'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<CallBloc>().add(const CallEvent.leaveCall());
+              context.push('/subscriptions');
+            },
+            child: const Text('Upgrade Plan'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _requestPermissionsAndJoinCall() async {
@@ -310,9 +423,42 @@ class _CallPageState extends State<CallPage> {
               ),
             ),
           ],
+          // Show remaining time if there's a time limit
+          if (_hasTimeLimit && _remainingSeconds != null) ...[
+            const SizedBox(width: 12),
+            Container(
+              width: 1,
+              height: 16,
+              color: Colors.white38,
+            ),
+            const SizedBox(width: 12),
+            Icon(
+              Icons.timer,
+              color: _remainingSeconds! <= 300 ? Colors.orange : Colors.white70,
+              size: 16,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              _formatDuration(_remainingSeconds!),
+              style: TextStyle(
+                color: _remainingSeconds! <= 300 ? Colors.orange : Colors.white70,
+                fontSize: 14,
+                fontWeight: _remainingSeconds! <= 300 ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  String _formatDuration(int seconds) {
+    if (seconds < 0) return '0:00';
+
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+
+    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   Widget _buildControls(BuildContext context, Call call) {

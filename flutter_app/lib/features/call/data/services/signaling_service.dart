@@ -175,6 +175,24 @@ class SignalingService {
     ));
   }
 
+  /// Start screen sharing
+  void startScreenShare(String roomId, String userId) {
+    send(SignalingMessage(
+      type: 'start_screen_share',
+      roomId: roomId,
+      userId: userId,
+    ));
+  }
+
+  /// Stop screen sharing
+  void stopScreenShare(String roomId, String userId) {
+    send(SignalingMessage(
+      type: 'stop_screen_share',
+      roomId: roomId,
+      userId: userId,
+    ));
+  }
+
   /// Update signaling state
   void _updateState(SignalingState newState) {
     _currentState = newState;

@@ -273,3 +273,34 @@ func GetRoomInfoHandler(hub *Hub) gin.HandlerFunc {
 		c.JSON(http.StatusOK, info)
 	}
 }
+
+// BroadcastToRoom broadcasts a message to all clients in a room
+func (h *Hub) BroadcastToRoom(roomID uuid.UUID, messageType string, data interface{}) {
+	h.mu.RLock()
+	room, exists := h.Rooms[roomID.String()]
+	h.mu.RUnlock()
+
+	if !exists {
+		log.Printf("Room %s not found for broadcast", roomID)
+		return
+	}
+
+	room.mu.RLock()
+	defer room.mu.RUnlock()
+
+	message := &Message{
+		Type:    messageType,
+		RoomID:  roomID.String(),
+		Payload: data,
+	}
+
+	// Send to all clients in the room
+	for client := range room.Clients {
+		select {
+		case client.Send <- []byte(messageType):
+			log.Printf("Broadcast '%s' to client %s in room %s", messageType, client.ID, roomID)
+		default:
+			log.Printf("Failed to send broadcast to client %s", client.ID)
+		}
+	}
+}

@@ -42,7 +42,7 @@ func SeedPlans() error {
 			Description:        "Perfect for trying out the platform",
 			Price:              0,
 			Currency:           "usd",
-			MaxMeetingDuration: 40,  // 40 minutes
+			MaxMeetingDuration: 45,  // 45 minutes
 			MaxParticipants:    3,   // 3 participants
 			CanRecord:          false,
 			CanScreenShare:     true,
@@ -53,32 +53,34 @@ func SeedPlans() error {
 		},
 		{
 			Type:               models.PlanPro,
-			Name:               "Pro",
-			Description:        "For professionals and small teams",
-			Price:              1500, // $15.00
+			Name:               "Pro Monthly",
+			Description:        "For professionals - billed monthly",
+			Price:              400, // $4.00
 			Currency:           "usd",
-			MaxMeetingDuration: 0,  // Unlimited
-			MaxParticipants:    10, // 10 participants
+			BillingPeriod:      "monthly",
+			MaxMeetingDuration: 0,   // Unlimited
+			MaxParticipants:    100, // 100 participants (high limit)
 			CanRecord:          true,
 			CanScreenShare:     true,
-			CloudStorageGB:     10,
+			CloudStorageGB:     50,
 			CanCustomBrand:     false,
 			HasAPIAccess:       false,
 			HasPrioritySupport: true,
 		},
 		{
 			Type:               models.PlanBusiness,
-			Name:               "Business",
-			Description:        "For large teams and enterprises",
-			Price:              5000, // $50.00
+			Name:               "Pro Yearly",
+			Description:        "For professionals - billed yearly (Save $8/year!)",
+			Price:              4000, // $40.00
 			Currency:           "usd",
+			BillingPeriod:      "yearly",
 			MaxMeetingDuration: 0,   // Unlimited
-			MaxParticipants:    50,  // 50 participants
+			MaxParticipants:    100, // 100 participants (high limit)
 			CanRecord:          true,
 			CanScreenShare:     true,
-			CloudStorageGB:     100,
-			CanCustomBrand:     true,
-			HasAPIAccess:       true,
+			CloudStorageGB:     50,
+			CanCustomBrand:     false,
+			HasAPIAccess:       false,
 			HasPrioritySupport: true,
 		},
 	}

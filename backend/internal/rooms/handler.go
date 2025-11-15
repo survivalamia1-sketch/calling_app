@@ -305,3 +305,32 @@ func (h *Handler) GetRoomParticipants(c *gin.Context) {
 
 	c.JSON(http.StatusOK, participants)
 }
+
+// GetRoomStatus godoc
+// @Summary Get room status
+// @Description Get room status including remaining time
+// @Tags rooms
+// @Produce json
+// @Param id path string true "Room ID"
+// @Success 200 {object} map[string]interface{}
+// @Router /rooms/{id}/status [get]
+func (h *Handler) GetRoomStatus(c *gin.Context) {
+	roomIDStr := c.Param("id")
+	roomID, err := uuid.Parse(roomIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid room ID",
+		})
+		return
+	}
+
+	status, err := h.service.GetRoomStatus(roomID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, status)
+}
