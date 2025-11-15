@@ -72,7 +72,7 @@ class SignalingService {
           .replaceFirst('https://', 'wss://');
 
       _channel = WebSocketChannel.connect(
-        Uri.parse('$wsUrl/ws/signaling?token=$token'),
+        Uri.parse('$wsUrl/ws?token=$token'),
       );
 
       _channel!.stream.listen(
