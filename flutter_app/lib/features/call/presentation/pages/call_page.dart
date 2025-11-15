@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/permissions_helper.dart';
 import '../../domain/entities/call.dart';
 import '../bloc/call_bloc.dart';
 
@@ -22,10 +23,56 @@ class _CallPageState extends State<CallPage> {
   @override
   void initState() {
     super.initState();
-    // Join call when page loads
+    // Request permissions and join call when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CallBloc>().add(CallEvent.joinCall(roomId: widget.roomId));
+      _requestPermissionsAndJoinCall();
     });
+  }
+
+  Future<void> _requestPermissionsAndJoinCall() async {
+    // Request camera and microphone permissions
+    final granted = await PermissionsHelper.requestCallPermissions();
+
+    if (!granted) {
+      if (mounted) {
+        _showPermissionDeniedDialog();
+      }
+      return;
+    }
+
+    // Permissions granted, join the call
+    if (mounted) {
+      context.read<CallBloc>().add(CallEvent.joinCall(roomId: widget.roomId));
+    }
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Permissions Required'),
+        content: const Text(
+          'Camera and microphone permissions are required for video calls. '
+          'Please grant the permissions in your device settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.pop(); // Go back from call page
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await PermissionsHelper.openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

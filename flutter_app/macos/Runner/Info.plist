@@ -28,5 +28,15 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+
+	<!-- WebRTC Permissions -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera for video calls</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to your microphone for audio calls</string>
+
+	<!-- Photo Library for Profile Pictures -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to update your profile picture</string>
 </dict>
 </plist>
