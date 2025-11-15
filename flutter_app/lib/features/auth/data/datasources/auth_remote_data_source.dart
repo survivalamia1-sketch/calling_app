@@ -124,7 +124,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final response = await client.get(ApiConstants.authProfile);
 
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user']);
+        // Backend returns user directly, not wrapped
+        return UserModel.fromJson(response.data['user'] ?? response.data);
       } else {
         throw const ServerException(message: 'Failed to get user');
       }
@@ -215,7 +216,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user']);
+        // Backend returns user directly, not wrapped
+        return UserModel.fromJson(response.data['user'] ?? response.data);
       } else {
         throw const ServerException(message: 'Failed to update profile');
       }

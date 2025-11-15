@@ -83,7 +83,8 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       final response = await client.get('${ApiConstants.rooms}/$id');
 
       if (response.statusCode == 200) {
-        return MeetingModel.fromJson(response.data['room']);
+        // Backend returns room directly, not wrapped
+        return MeetingModel.fromJson(response.data['room'] ?? response.data);
       } else {
         throw const ServerException(message: 'Failed to get meeting');
       }
@@ -119,17 +120,21 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       final response = await client.post(
         ApiConstants.rooms,
         data: {
-          'title': title,
+          'name': title, // Backend expects 'name', not 'title'
           'description': description,
           'scheduled_at': scheduledAt.toIso8601String(),
-          if (duration != null) 'duration': duration,
           if (maxParticipants != null) 'max_participants': maxParticipants,
-          if (requiresApproval != null) 'requires_approval': requiresApproval,
+          if (requiresApproval != null)
+            'has_waiting_room':
+                requiresApproval, // Backend uses 'has_waiting_room'
+          'is_password_locked': false, // Default
+          'password': '', // Default empty
         },
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        return MeetingModel.fromJson(response.data['room']);
+        // Backend returns room directly, not wrapped
+        return MeetingModel.fromJson(response.data['room'] ?? response.data);
       } else {
         throw const ServerException(message: 'Failed to create meeting');
       }
@@ -155,38 +160,10 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
     int? maxParticipants,
     bool? requiresApproval,
   }) async {
-    try {
-      final data = <String, dynamic>{};
-      if (title != null) data['title'] = title;
-      if (description != null) data['description'] = description;
-      if (scheduledAt != null) {
-        data['scheduled_at'] = scheduledAt.toIso8601String();
-      }
-      if (duration != null) data['duration'] = duration;
-      if (maxParticipants != null) data['max_participants'] = maxParticipants;
-      if (requiresApproval != null) {
-        data['requires_approval'] = requiresApproval;
-      }
-
-      final response = await client.put(
-        '${ApiConstants.rooms}/$id',
-        data: data,
-      );
-
-      if (response.statusCode == 200) {
-        return MeetingModel.fromJson(response.data['room']);
-      } else {
-        throw const ServerException(message: 'Failed to update meeting');
-      }
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw const UnauthorizedException(message: 'Unauthorized');
-      }
-      if (e.response?.statusCode == 404) {
-        throw const ServerException(message: 'Meeting not found');
-      }
-      throw ServerException(message: e.message ?? 'Network error');
-    }
+    // Note: Backend does not have an update room endpoint
+    // Rooms can only be created, deleted, or ended
+    throw const ServerException(
+        message: 'Update room not implemented in backend');
   }
 
   @override
@@ -211,9 +188,14 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
   @override
   Future<String> joinMeeting(String roomCode) async {
     try {
+      // Backend expects room ID in URL, password and name in body
+      // roomCode should be the room ID (UUID), not a code
       final response = await client.post(
-        ApiConstants.roomJoin(roomCode),
-        data: {'room_code': roomCode},
+        ApiConstants.roomJoin(roomCode), // roomCode is actually room ID
+        data: {
+          'password': '', // Optional, required only if room is locked
+          'name': '', // Optional, for guest users
+        },
       );
 
       if (response.statusCode == 200) {
@@ -239,9 +221,10 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
   @override
   Future<void> leaveMeeting(String roomId) async {
     try {
+      // Backend expects POST to /rooms/{id}/leave, not /rooms/{id}
       final response = await client.post(
-        ApiConstants.roomById(roomId),
-        data: {'room_id': roomId},
+        ApiConstants.roomLeave(roomId), // Use roomLeave endpoint
+        data: {}, // Empty body
       );
 
       if (response.statusCode != 200) {

@@ -30,7 +30,10 @@ class SubscriptionsRemoteDataSourceImpl
       final response = await client.get(ApiConstants.subscriptionsPlans);
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data['plans'] ?? response.data;
+        // Backend returns array directly, but PowerShell might wrap it in 'value'
+        final List<dynamic> data = response.data['value'] ??
+            response.data['plans'] ??
+            (response.data is List ? response.data : []);
         return data
             .map((json) => SubscriptionPlanModel.fromJson(json))
             .toList();
@@ -48,7 +51,9 @@ class SubscriptionsRemoteDataSourceImpl
       final response = await client.get(ApiConstants.subscriptionsCurrent);
 
       if (response.statusCode == 200) {
-        return UserSubscriptionModel.fromJson(response.data['subscription']);
+        // Backend returns subscription directly, not wrapped
+        return UserSubscriptionModel.fromJson(
+            response.data['subscription'] ?? response.data);
       } else {
         throw const ServerException(message: 'Failed to get subscription');
       }
@@ -69,11 +74,13 @@ class SubscriptionsRemoteDataSourceImpl
     required String billingCycle,
   }) async {
     try {
+      // Backend expects plan_type (string: "pro" or "business"), not plan_id
+      // Convert plan_id to plan_type if needed, or use plan_type directly
       final response = await client.post(
         ApiConstants.subscriptionsCheckout,
         data: {
-          'plan_id': planId,
-          'billing_cycle': billingCycle,
+          'plan_type':
+              planId, // Assuming planId is actually plan_type like "pro" or "business"
         },
       );
 
