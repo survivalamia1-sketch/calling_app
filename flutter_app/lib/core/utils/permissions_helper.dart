@@ -1,17 +1,28 @@
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
+
+import 'platform_helper.dart';
 
 class PermissionsHelper {
   /// Request camera and microphone permissions for video calls
   static Future<bool> requestCallPermissions() async {
     // For web, permissions are handled by the browser
-    if (!Platform.isAndroid && !Platform.isIOS && !Platform.isMacOS) {
+    if (kIsWeb) {
       return true;
     }
 
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.camera,
-      Permission.microphone,
+    // For non-web platforms, check if it's a mobile/desktop platform
+    if (!PlatformHelper.isAndroid &&
+        !PlatformHelper.isIOS &&
+        !PlatformHelper.isMacOS) {
+      return true;
+    }
+
+    Map<permission_handler.Permission, permission_handler.PermissionStatus>
+        statuses = await [
+      permission_handler.Permission.camera,
+      permission_handler.Permission.microphone,
     ].request();
 
     // Check if all permissions are granted
@@ -24,31 +35,45 @@ class PermissionsHelper {
 
   /// Check if call permissions are already granted
   static Future<bool> hasCallPermissions() async {
-    if (!Platform.isAndroid && !Platform.isIOS && !Platform.isMacOS) {
+    // For web, permissions are handled by the browser
+    if (kIsWeb) {
       return true;
     }
 
-    bool cameraGranted = await Permission.camera.isGranted;
-    bool microphoneGranted = await Permission.microphone.isGranted;
+    if (!PlatformHelper.isAndroid &&
+        !PlatformHelper.isIOS &&
+        !PlatformHelper.isMacOS) {
+      return true;
+    }
+
+    bool cameraGranted = await permission_handler.Permission.camera.isGranted;
+    bool microphoneGranted =
+        await permission_handler.Permission.microphone.isGranted;
 
     return cameraGranted && microphoneGranted;
   }
 
   /// Request storage permission for file uploads (Android only)
   static Future<bool> requestStoragePermission() async {
-    if (!Platform.isAndroid) {
+    // For web, permissions are handled by the browser
+    if (kIsWeb) {
+      return true;
+    }
+
+    if (!PlatformHelper.isAndroid) {
       return true;
     }
 
     // For Android 13+, use photos permission
-    if (Platform.isAndroid) {
-      final status = await Permission.photos.request();
+    if (PlatformHelper.isAndroid) {
+      final status = await permission_handler.Permission.photos.request();
       if (status.isGranted) {
         return true;
       }
 
       // Fallback to storage for older Android versions
-      final storageStatus = await Permission.storage.request();
+      final storageStatus =
+          await permission_handler.Permission.storage.request();
       return storageStatus.isGranted;
     }
 
@@ -57,15 +82,19 @@ class PermissionsHelper {
 
   /// Open app settings if permissions are permanently denied
   static Future<void> openAppSettings() async {
-    await openAppSettings();
+    // For web, settings are handled by the browser
+    if (kIsWeb) {
+      return;
+    }
+    await permission_handler.openAppSettings();
   }
 
   /// Check and request all necessary permissions
   static Future<Map<String, bool>> checkAllPermissions() async {
     final results = <String, bool>{};
 
-    if (!Platform.isAndroid && !Platform.isIOS && !Platform.isMacOS) {
-      // Web and desktop (except macOS) don't need explicit permission checks
+    // For web, permissions are handled by the browser
+    if (kIsWeb) {
       return {
         'camera': true,
         'microphone': true,
@@ -73,12 +102,25 @@ class PermissionsHelper {
       };
     }
 
-    results['camera'] = await Permission.camera.isGranted;
-    results['microphone'] = await Permission.microphone.isGranted;
+    if (!PlatformHelper.isAndroid &&
+        !PlatformHelper.isIOS &&
+        !PlatformHelper.isMacOS) {
+      // Desktop (except macOS) don't need explicit permission checks
+      return {
+        'camera': true,
+        'microphone': true,
+        'storage': true,
+      };
+    }
 
-    if (Platform.isAndroid) {
-      results['storage'] = await Permission.storage.isGranted ||
-          await Permission.photos.isGranted;
+    results['camera'] = await permission_handler.Permission.camera.isGranted;
+    results['microphone'] =
+        await permission_handler.Permission.microphone.isGranted;
+
+    if (PlatformHelper.isAndroid) {
+      results['storage'] =
+          await permission_handler.Permission.storage.isGranted ||
+              await permission_handler.Permission.photos.isGranted;
     } else {
       results['storage'] = true;
     }
@@ -102,7 +144,7 @@ class PermissionsHelper {
 
   /// Request permission with user-friendly handling
   static Future<bool> requestPermissionWithRationale({
-    required Permission permission,
+    required permission_handler.Permission permission,
     required String permissionName,
   }) async {
     final status = await permission.status;

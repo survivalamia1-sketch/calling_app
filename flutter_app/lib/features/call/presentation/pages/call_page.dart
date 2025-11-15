@@ -198,7 +198,11 @@ class _CallPageState extends State<CallPage> {
             state.whenOrNull(
               disconnected: () {
                 // Navigate back when call ends
-                context.pop();
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/meetings');
+                }
               },
               error: (message) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -268,7 +272,13 @@ class _CallPageState extends State<CallPage> {
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: () => context.pop(),
+                      onPressed: () {
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.go('/meetings');
+                        }
+                      },
                       child: const Text('Go Back'),
                     ),
                   ],
@@ -441,9 +451,12 @@ class _CallPageState extends State<CallPage> {
             Text(
               _formatDuration(_remainingSeconds!),
               style: TextStyle(
-                color: _remainingSeconds! <= 300 ? Colors.orange : Colors.white70,
+                color:
+                    _remainingSeconds! <= 300 ? Colors.orange : Colors.white70,
                 fontSize: 14,
-                fontWeight: _remainingSeconds! <= 300 ? FontWeight.bold : FontWeight.normal,
+                fontWeight: _remainingSeconds! <= 300
+                    ? FontWeight.bold
+                    : FontWeight.normal,
               ),
             ),
           ],

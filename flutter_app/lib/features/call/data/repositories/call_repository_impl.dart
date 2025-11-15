@@ -78,7 +78,33 @@ class CallRepositoryImpl implements CallRepository {
       );
 
       // Create local media stream
-      await webrtcService.createLocalStream(audio: true, video: true);
+      try {
+        await webrtcService.createLocalStream(audio: true, video: true);
+      } catch (e) {
+        final errorMessage = e.toString().toLowerCase();
+        String userFriendlyMessage;
+        
+        if (errorMessage.contains('notreadable') || 
+            errorMessage.contains('could not start video source')) {
+          userFriendlyMessage = 
+              'Unable to access camera/microphone. Please check:\n'
+              '• Camera/microphone is not being used by another application\n'
+              '• Browser permissions are granted\n'
+              '• Device is connected and working';
+        } else if (errorMessage.contains('notallowed') || 
+                   errorMessage.contains('permission denied')) {
+          userFriendlyMessage = 
+              'Camera/microphone permission denied. Please grant permissions in your browser settings.';
+        } else if (errorMessage.contains('notfound') || 
+                   errorMessage.contains('no device')) {
+          userFriendlyMessage = 
+              'No camera/microphone found. Please connect a camera and microphone.';
+        } else {
+          userFriendlyMessage = 'Failed to access camera/microphone: $e';
+        }
+        
+        return Left(ServerFailure(message: userFriendlyMessage));
+      }
 
       // Setup WebRTC peer connection listeners
       webrtcService.setupPeerConnectionListeners(
