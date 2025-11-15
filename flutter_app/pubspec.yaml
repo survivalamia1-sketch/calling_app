@@ -62,9 +62,6 @@ dependencies:
   # Image Picker
   image_picker: ^1.0.5
 
-  # URL Launcher
-  url_launcher: ^6.2.2
-
   # Network Info
   internet_connection_checker: ^1.0.0+1
 
