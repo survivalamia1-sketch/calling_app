@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/meeting_model.dart';
@@ -66,13 +67,13 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
         final List<dynamic> data = response.data['rooms'] ?? response.data;
         return data.map((json) => MeetingModel.fromJson(json)).toList();
       } else {
-        throw ServerException('Failed to get meetings');
+        throw const ServerException(message: 'Failed to get meetings');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -84,16 +85,16 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       if (response.statusCode == 200) {
         return MeetingModel.fromJson(response.data['room']);
       } else {
-        throw ServerException('Failed to get meeting');
+        throw const ServerException(message: 'Failed to get meeting');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 404) {
-        throw ServerException('Meeting not found');
+        throw const ServerException(message: 'Meeting not found');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -108,13 +109,14 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       if (response.statusCode == 200) {
         return MeetingModel.fromJson(response.data['room']);
       } else {
-        throw ServerException('Failed to find meeting');
+        throw const ServerException(message: 'Failed to find meeting');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        throw ServerException('Meeting not found with this code');
+        throw const ServerException(
+            message: 'Meeting not found with this code');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -143,17 +145,17 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       if (response.statusCode == 201 || response.statusCode == 200) {
         return MeetingModel.fromJson(response.data['room']);
       } else {
-        throw ServerException('Failed to create meeting');
+        throw const ServerException(message: 'Failed to create meeting');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 400) {
         throw ServerException(
-            e.response?.data['message'] ?? 'Invalid meeting data');
+            message: e.response?.data['message'] ?? 'Invalid meeting data');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -176,7 +178,9 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       }
       if (duration != null) data['duration'] = duration;
       if (maxParticipants != null) data['max_participants'] = maxParticipants;
-      if (requiresApproval != null) data['requires_approval'] = requiresApproval;
+      if (requiresApproval != null) {
+        data['requires_approval'] = requiresApproval;
+      }
 
       final response = await client.put(
         '${ApiConstants.rooms}/$id',
@@ -186,16 +190,16 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       if (response.statusCode == 200) {
         return MeetingModel.fromJson(response.data['room']);
       } else {
-        throw ServerException('Failed to update meeting');
+        throw const ServerException(message: 'Failed to update meeting');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 404) {
-        throw ServerException('Meeting not found');
+        throw const ServerException(message: 'Meeting not found');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -205,16 +209,16 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       final response = await client.delete('${ApiConstants.rooms}/$id');
 
       if (response.statusCode != 200 && response.statusCode != 204) {
-        throw ServerException('Failed to delete meeting');
+        throw const ServerException(message: 'Failed to delete meeting');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 404) {
-        throw ServerException('Meeting not found');
+        throw const ServerException(message: 'Meeting not found');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -222,26 +226,27 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
   Future<String> joinMeeting(String roomCode) async {
     try {
       final response = await client.post(
-        ApiConstants.roomsJoin,
+        ApiConstants.roomJoin(roomCode),
         data: {'room_code': roomCode},
       );
 
       if (response.statusCode == 200) {
         return response.data['room_id'] as String;
       } else {
-        throw ServerException('Failed to join meeting');
+        throw const ServerException(message: 'Failed to join meeting');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 404) {
-        throw ServerException('Meeting not found');
+        throw const ServerException(message: 'Meeting not found');
       }
       if (e.response?.statusCode == 403) {
-        throw ServerException('You are not allowed to join this meeting');
+        throw const ServerException(
+            message: 'You are not allowed to join this meeting');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -249,15 +254,15 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
   Future<void> leaveMeeting(String roomId) async {
     try {
       final response = await client.post(
-        ApiConstants.roomsLeave,
+        ApiConstants.roomById(roomId),
         data: {'room_id': roomId},
       );
 
       if (response.statusCode != 200) {
-        throw ServerException('Failed to leave meeting');
+        throw const ServerException(message: 'Failed to leave meeting');
       }
     } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 }

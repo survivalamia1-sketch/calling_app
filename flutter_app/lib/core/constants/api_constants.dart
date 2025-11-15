@@ -29,8 +29,9 @@ class ApiConstants {
   static const String roomsUpcoming = '/rooms/upcoming';
 
   static const String subscriptionsPlans = '/subscriptions/plans';
-  static const String subscriptionsCheckout = '/subscriptions/create-checkout-session';
+  static const String subscriptionsCheckout =
+      '/subscriptions/create-checkout-session';
   static const String subscriptionsCancel = '/subscriptions/cancel';
-
+  static const String subscriptionsMe = '/subscriptions/me';
   static const String supportTickets = '/support/tickets';
 }

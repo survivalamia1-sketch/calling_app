@@ -1,11 +1,14 @@
+import 'package:calling_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../auth/presentation/bloc/auth_bloc.dart';
-import '../bloc/dashboard_bloc.dart';
+
 import '../../../../core/di/injection.dart';
-import '../widgets/stat_card.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_event.dart';
+import '../bloc/dashboard_bloc.dart';
 import '../widgets/quick_action_card.dart';
+import '../widgets/stat_card.dart';
 import '../widgets/upcoming_meetings_card.dart';
 
 class HomeDashboardPage extends StatelessWidget {
@@ -16,12 +19,12 @@ class HomeDashboardPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => getIt<AuthBloc>()
-            ..add(const AuthEvent.getCurrentUserRequested()),
+          create: (context) =>
+              getIt<AuthBloc>()..add(const AuthEvent.getCurrentUserRequested()),
         ),
         BlocProvider(
-          create: (context) => getIt<DashboardBloc>()
-            ..add(const DashboardEvent.loadDashboard()),
+          create: (context) =>
+              getIt<DashboardBloc>()..add(const DashboardEvent.loadDashboard()),
         ),
       ],
       child: Scaffold(
@@ -92,7 +95,7 @@ class HomeDashboardPage extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.6),
+                            .withValues(alpha: 0.6),
                       ),
                 ),
                 const SizedBox(height: 32),

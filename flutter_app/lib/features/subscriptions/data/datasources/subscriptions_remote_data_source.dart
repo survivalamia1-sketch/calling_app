@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/subscription_plan_model.dart';
@@ -30,12 +31,14 @@ class SubscriptionsRemoteDataSourceImpl
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['plans'] ?? response.data;
-        return data.map((json) => SubscriptionPlanModel.fromJson(json)).toList();
+        return data
+            .map((json) => SubscriptionPlanModel.fromJson(json))
+            .toList();
       } else {
-        throw ServerException('Failed to get plans');
+        throw const ServerException(message: 'Failed to get plans');
       }
     } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -47,16 +50,16 @@ class SubscriptionsRemoteDataSourceImpl
       if (response.statusCode == 200) {
         return UserSubscriptionModel.fromJson(response.data['subscription']);
       } else {
-        throw ServerException('Failed to get subscription');
+        throw const ServerException(message: 'Failed to get subscription');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 404) {
-        throw ServerException('No active subscription');
+        throw const ServerException(message: 'No active subscription');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -77,13 +80,14 @@ class SubscriptionsRemoteDataSourceImpl
       if (response.statusCode == 200) {
         return response.data['checkout_url'] as String;
       } else {
-        throw ServerException('Failed to create checkout session');
+        throw const ServerException(
+            message: 'Failed to create checkout session');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -93,13 +97,13 @@ class SubscriptionsRemoteDataSourceImpl
       final response = await client.post(ApiConstants.subscriptionsCancel);
 
       if (response.statusCode != 200) {
-        throw ServerException('Failed to cancel subscription');
+        throw const ServerException(message: 'Failed to cancel subscription');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -120,13 +124,13 @@ class SubscriptionsRemoteDataSourceImpl
       if (response.statusCode == 200) {
         return UserSubscriptionModel.fromJson(response.data['subscription']);
       } else {
-        throw ServerException('Failed to update subscription');
+        throw const ServerException(message: 'Failed to update subscription');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 }

@@ -1,10 +1,11 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'dart:io';
-import '../../../../core/di/injection.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../domain/entities/bug_report.dart';
 import '../../domain/entities/faq.dart';
@@ -132,7 +133,7 @@ class _SupportPageState extends State<SupportPage> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    if (state is _Loading)
+                    if (state is Loading)
                       const SizedBox(
                         width: 20,
                         height: 20,
@@ -199,8 +200,7 @@ class _SupportPageState extends State<SupportPage> {
                       ListTile(
                         leading: const Icon(Icons.menu_book),
                         title: const Text('User Guide'),
-                        trailing:
-                            const Icon(Icons.arrow_forward_ios, size: 16),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
                           // TODO: Open user guide
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -213,8 +213,7 @@ class _SupportPageState extends State<SupportPage> {
                       ListTile(
                         leading: const Icon(Icons.video_library),
                         title: const Text('Video Tutorials'),
-                        trailing:
-                            const Icon(Icons.arrow_forward_ios, size: 16),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
                           // TODO: Open tutorials
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -227,8 +226,7 @@ class _SupportPageState extends State<SupportPage> {
                       ListTile(
                         leading: const Icon(Icons.bug_report),
                         title: const Text('Report a Bug'),
-                        trailing:
-                            const Icon(Icons.arrow_forward_ios, size: 16),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
                           _showBugReportDialog(context);
                         },
@@ -255,7 +253,10 @@ class _SupportPageState extends State<SupportPage> {
               Icon(
                 Icons.help_outline,
                 size: 48,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.5),
               ),
               const SizedBox(height: 16),
               Text(
@@ -290,7 +291,7 @@ class _SupportPageState extends State<SupportPage> {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
             ),
           ),
@@ -340,7 +341,7 @@ class _SupportPageState extends State<SupportPage> {
             ),
             BlocBuilder<SupportBloc, SupportState>(
               builder: (context, state) {
-                final isLoading = state is _Loading;
+                final isLoading = state is Loading;
 
                 return ElevatedButton(
                   onPressed: isLoading
@@ -350,8 +351,8 @@ class _SupportPageState extends State<SupportPage> {
                               descriptionController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text(
-                                    'Please fill in all required fields'),
+                                content:
+                                    Text('Please fill in all required fields'),
                                 backgroundColor: Colors.orange,
                               ),
                             );
@@ -363,7 +364,8 @@ class _SupportPageState extends State<SupportPage> {
                           String? appVersion;
 
                           try {
-                            final packageInfo = await PackageInfo.fromPlatform();
+                            final packageInfo =
+                                await PackageInfo.fromPlatform();
                             appVersion = packageInfo.version;
 
                             final deviceInfoPlugin = DeviceInfoPlugin();
@@ -383,6 +385,7 @@ class _SupportPageState extends State<SupportPage> {
 
                           // Get user email if authenticated
                           String? contactEmail;
+                          if (!context.mounted) return;
                           final authState = context.read<AuthBloc>().state;
                           authState.maybeWhen(
                             authenticated: (user) {
@@ -399,12 +402,15 @@ class _SupportPageState extends State<SupportPage> {
                             appVersion: appVersion,
                           );
 
-                          context.read<SupportBloc>().add(
-                                SupportEvent.submitBugReport(
-                                    bugReport: bugReport),
-                              );
+                          if (context.mounted) {
+                            context.read<SupportBloc>().add(
+                                  SupportEvent.submitBugReport(
+                                    bugReport: bugReport,
+                                  ),
+                                );
 
-                          Navigator.pop(dialogContext);
+                            Navigator.pop(dialogContext);
+                          }
                         },
                   child: isLoading
                       ? const SizedBox(

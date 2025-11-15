@@ -1,8 +1,11 @@
+import 'package:calling_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/di/injection.dart';
 import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
 import '../widgets/custom_button.dart';
 
 class EmailVerificationPage extends StatelessWidget {
@@ -82,7 +85,7 @@ class EmailVerificationPage extends StatelessWidget {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface
-                                        .withOpacity(0.6),
+                                        .withValues(alpha: 0.6),
                                   ),
                           textAlign: TextAlign.center,
                         ),
@@ -92,9 +95,8 @@ class EmailVerificationPage extends StatelessWidget {
                         CustomButton(
                           text: 'Resend Verification Email',
                           onPressed: () {
-                            context
-                                .read<AuthBloc>()
-                                .add(const AuthEvent.resendVerificationRequested());
+                            context.read<AuthBloc>().add(
+                                const AuthEvent.resendVerificationRequested());
                           },
                           isLoading: isLoading,
                           isOutlined: true,

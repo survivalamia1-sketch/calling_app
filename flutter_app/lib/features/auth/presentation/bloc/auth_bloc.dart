@@ -1,10 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/usecases/usecase.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/get_current_user.dart';
 import '../../domain/usecases/login.dart';
 import '../../domain/usecases/logout.dart';
 import '../../domain/usecases/register.dart';
-import '../../domain/repositories/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -22,17 +23,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.getCurrentUserUseCase,
     required this.repository,
   }) : super(const AuthState.initial()) {
-    on<_CheckAuthStatus>(_onCheckAuthStatus);
-    on<_SignInRequested>(_onSignInRequested);
-    on<_RegisterRequested>(_onRegisterRequested);
-    on<_SignOutRequested>(_onSignOutRequested);
-    on<_ForgotPasswordRequested>(_onForgotPasswordRequested);
-    on<_ResendVerificationRequested>(_onResendVerificationRequested);
-    on<_GetCurrentUserRequested>(_onGetCurrentUserRequested);
+    on<CheckAuthStatus>(_onCheckAuthStatus);
+    on<SignInRequested>(_onSignInRequested);
+    on<RegisterRequested>(_onRegisterRequested);
+    on<SignOutRequested>(_onSignOutRequested);
+    on<ForgotPasswordRequested>(_onForgotPasswordRequested);
+    on<ResendVerificationRequested>(_onResendVerificationRequested);
+    on<GetCurrentUserRequested>(_onGetCurrentUserRequested);
   }
 
   Future<void> _onCheckAuthStatus(
-    _CheckAuthStatus event,
+    CheckAuthStatus event,
     Emitter<AuthState> emit,
   ) async {
     final isLoggedIn = await repository.isLoggedIn();
@@ -57,7 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onSignInRequested(
-    _SignInRequested event,
+    SignInRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthState.loading());
@@ -80,7 +81,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onRegisterRequested(
-    _RegisterRequested event,
+    RegisterRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthState.loading());
@@ -105,7 +106,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onSignOutRequested(
-    _SignOutRequested event,
+    SignOutRequested event,
     Emitter<AuthState> emit,
   ) async {
     final result = await logoutUseCase(NoParams());
@@ -117,7 +118,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onForgotPasswordRequested(
-    _ForgotPasswordRequested event,
+    ForgotPasswordRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthState.loading());
@@ -131,7 +132,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onResendVerificationRequested(
-    _ResendVerificationRequested event,
+    ResendVerificationRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthState.loading());
@@ -145,7 +146,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onGetCurrentUserRequested(
-    _GetCurrentUserRequested event,
+    GetCurrentUserRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthState.loading());

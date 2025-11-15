@@ -1,28 +1,29 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/create_meeting.dart';
+
+import '../../domain/usecases/create_meeting.dart' as create_meeting;
 import '../../domain/usecases/get_meetings.dart';
-import '../../domain/usecases/join_meeting.dart';
+import '../../domain/usecases/join_meeting.dart' as join_meeting;
 import 'meetings_event.dart';
 import 'meetings_state.dart';
 
 class MeetingsBloc extends Bloc<MeetingsEvent, MeetingsState> {
   final GetMeetings getMeetingsUseCase;
-  final CreateMeeting createMeetingUseCase;
-  final JoinMeeting joinMeetingUseCase;
+  final create_meeting.CreateMeeting createMeetingUseCase;
+  final join_meeting.JoinMeeting joinMeetingUseCase;
 
   MeetingsBloc({
     required this.getMeetingsUseCase,
     required this.createMeetingUseCase,
     required this.joinMeetingUseCase,
   }) : super(const MeetingsState.initial()) {
-    on<_LoadMeetings>(_onLoadMeetings);
-    on<_CreateMeeting>(_onCreateMeeting);
-    on<_JoinMeeting>(_onJoinMeeting);
-    on<_RefreshMeetings>(_onRefreshMeetings);
+    on<LoadMeetings>(_onLoadMeetings);
+    on<CreateMeeting>(_onCreateMeeting);
+    on<JoinMeeting>(_onJoinMeeting);
+    on<RefreshMeetings>(_onRefreshMeetings);
   }
 
   Future<void> _onLoadMeetings(
-    _LoadMeetings event,
+    LoadMeetings event,
     Emitter<MeetingsState> emit,
   ) async {
     emit(const MeetingsState.loading());
@@ -38,12 +39,13 @@ class MeetingsBloc extends Bloc<MeetingsEvent, MeetingsState> {
   }
 
   Future<void> _onCreateMeeting(
-    _CreateMeeting event,
+    CreateMeeting event,
     Emitter<MeetingsState> emit,
   ) async {
     emit(const MeetingsState.loading());
 
-    final result = await createMeetingUseCase(CreateMeetingParams(
+    final result =
+        await createMeetingUseCase(create_meeting.CreateMeetingParams(
       title: event.title,
       description: event.description,
       scheduledAt: event.scheduledAt,
@@ -63,12 +65,12 @@ class MeetingsBloc extends Bloc<MeetingsEvent, MeetingsState> {
   }
 
   Future<void> _onJoinMeeting(
-    _JoinMeeting event,
+    JoinMeeting event,
     Emitter<MeetingsState> emit,
   ) async {
     emit(const MeetingsState.loading());
 
-    final result = await joinMeetingUseCase(JoinMeetingParams(
+    final result = await joinMeetingUseCase(join_meeting.JoinMeetingParams(
       roomCode: event.roomCode,
     ));
 
@@ -79,7 +81,7 @@ class MeetingsBloc extends Bloc<MeetingsEvent, MeetingsState> {
   }
 
   Future<void> _onRefreshMeetings(
-    _RefreshMeetings event,
+    RefreshMeetings event,
     Emitter<MeetingsState> emit,
   ) async {
     final result = await getMeetingsUseCase(const GetMeetingsParams());

@@ -1,14 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/entities/settings.dart';
 import '../../domain/usecases/get_settings.dart';
 import '../../domain/usecases/reset_settings.dart';
 import '../../domain/usecases/update_settings.dart';
 
+part 'settings_bloc.freezed.dart';
 part 'settings_event.dart';
 part 'settings_state.dart';
-part 'settings_bloc.freezed.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final GetSettings getSettings;
@@ -42,7 +43,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     result.fold(
       (failure) => emit(SettingsState.error(
-        message: failure.message ?? 'Failed to load settings',
+        message: failure.message,
       )),
       (settings) => emit(SettingsState.loaded(settings: settings)),
     );
@@ -58,7 +59,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     result.fold(
       (failure) => emit(SettingsState.error(
-        message: failure.message ?? 'Failed to update settings',
+        message: failure.message,
       )),
       (_) => emit(SettingsState.updated(settings: event.settings)),
     );
@@ -72,14 +73,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     await result.fold(
       (failure) async => emit(SettingsState.error(
-        message: failure.message ?? 'Failed to reset settings',
+        message: failure.message,
       )),
       (_) async {
         // Reload settings after reset
         final getResult = await getSettings(NoParams());
         getResult.fold(
           (failure) => emit(SettingsState.error(
-            message: failure.message ?? 'Failed to load settings',
+            message: failure.message,
           )),
           (settings) => emit(SettingsState.loaded(settings: settings)),
         );
@@ -112,13 +113,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   ) async {
     await state.maybeWhen(
       loaded: (settings) async {
-        final newSettings =
-            settings.copyWith(emailNotifications: event.value);
+        final newSettings = settings.copyWith(emailNotifications: event.value);
         add(SettingsEvent.updateSettings(settings: newSettings));
       },
       updated: (settings) async {
-        final newSettings =
-            settings.copyWith(emailNotifications: event.value);
+        final newSettings = settings.copyWith(emailNotifications: event.value);
         add(SettingsEvent.updateSettings(settings: newSettings));
       },
       orElse: () {},

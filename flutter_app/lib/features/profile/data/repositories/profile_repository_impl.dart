@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/network_info.dart';
@@ -22,17 +23,17 @@ class ProfileRepositoryImpl implements ProfileRepository {
       ProfileUpdate profileUpdate) async {
     if (await networkInfo.isConnected) {
       try {
-        final profileUpdateModel =
-            ProfileUpdateModel.fromDomain(profileUpdate);
-        final userModel = await remoteDataSource.updateProfile(profileUpdateModel);
+        final profileUpdateModel = ProfileUpdateModel.fromDomain(profileUpdate);
+        final userModel =
+            await remoteDataSource.updateProfile(profileUpdateModel);
         return Right(userModel.toDomain());
       } on UnauthorizedException {
-        return Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
         return Left(ServerFailure(message: e.message));
       }
     } else {
-      return Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -46,12 +47,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
         await remoteDataSource.changePassword(passwordChangeModel);
         return const Right(unit);
       } on UnauthorizedException {
-        return Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
         return Left(ServerFailure(message: e.message));
       }
     } else {
-      return Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -62,12 +63,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
         final userModel = await remoteDataSource.getProfile();
         return Right(userModel.toDomain());
       } on UnauthorizedException {
-        return Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
         return Left(ServerFailure(message: e.message));
       }
     } else {
-      return Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 }

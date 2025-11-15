@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:developer';
+
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
 import '../../../../core/constants/api_constants.dart';
 
 enum SignalingState {
@@ -79,22 +82,22 @@ class SignalingService {
             final signalingMessage = SignalingMessage.fromJson(message);
             _messageController.add(signalingMessage);
           } catch (e) {
-            print('Error parsing signaling message: $e');
+            log('Error parsing signaling message: $e');
           }
         },
         onError: (error) {
-          print('WebSocket error: $error');
+          log('WebSocket error: $error');
           _updateState(SignalingState.error);
         },
         onDone: () {
-          print('WebSocket connection closed');
+          log('WebSocket connection closed');
           _updateState(SignalingState.disconnected);
         },
       );
 
       _updateState(SignalingState.connected);
     } catch (e) {
-      print('Failed to connect to signaling server: $e');
+      log('Failed to connect to signaling server: $e');
       _updateState(SignalingState.error);
       rethrow;
     }

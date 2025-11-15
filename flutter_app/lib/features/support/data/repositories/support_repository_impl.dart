@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/network_info.dart';
@@ -18,13 +19,13 @@ class SupportRepositoryImpl implements SupportRepository {
   });
 
   @override
-  Future<Either<Failure, List<FAQ>>> getFAQs() async {
+  Future<Either<Failure, List<FAQ>>> getFAQs({String? category}) async {
     if (!await networkInfo.isConnected) {
-      return Left(NetworkFailure(message: 'No internet connection'));
+      return const Left(NetworkFailure(message: 'No internet connection'));
     }
 
     try {
-      final faqModels = await remoteDataSource.getFAQs();
+      final faqModels = await remoteDataSource.getFAQs(category: category);
       final faqs = faqModels.map((model) => model.toDomain()).toList();
       return Right(faqs);
     } on UnauthorizedException catch (e) {
@@ -32,14 +33,14 @@ class SupportRepositoryImpl implements SupportRepository {
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } catch (e) {
-      return Left(ServerFailure(message: 'An unexpected error occurred'));
+      return const Left(ServerFailure(message: 'An unexpected error occurred'));
     }
   }
 
   @override
   Future<Either<Failure, Unit>> submitBugReport(BugReport bugReport) async {
     if (!await networkInfo.isConnected) {
-      return Left(NetworkFailure(message: 'No internet connection'));
+      return const Left(NetworkFailure(message: 'No internet connection'));
     }
 
     try {
@@ -51,7 +52,7 @@ class SupportRepositoryImpl implements SupportRepository {
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } catch (e) {
-      return Left(ServerFailure(message: 'An unexpected error occurred'));
+      return const Left(ServerFailure(message: 'An unexpected error occurred'));
     }
   }
 }

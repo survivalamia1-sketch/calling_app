@@ -1,4 +1,7 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:hive/hive.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../models/settings_model.dart';
 
@@ -29,7 +32,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
         return defaultSettings;
       }
     } catch (e) {
-      throw CacheException(message: 'Failed to get settings from cache');
+      throw const CacheException(message: 'Failed to get settings from cache');
     }
   }
 
@@ -38,7 +41,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
     try {
       await settingsBox.put(SETTINGS_KEY, settings);
     } catch (e) {
-      throw CacheException(message: 'Failed to cache settings');
+      throw const CacheException(message: 'Failed to cache settings');
     }
   }
 
@@ -49,7 +52,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
       // Put default settings back
       await cacheSettings(SettingsModel.defaultSettings());
     } catch (e) {
-      throw CacheException(message: 'Failed to clear settings');
+      throw const CacheException(message: 'Failed to clear settings');
     }
   }
 }

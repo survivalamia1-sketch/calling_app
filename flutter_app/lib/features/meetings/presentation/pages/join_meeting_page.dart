@@ -117,7 +117,7 @@ class _JoinMeetingPageState extends State<JoinMeetingPage> {
                 color: Theme.of(context)
                     .colorScheme
                     .primaryContainer
-                    .withOpacity(0.3),
+                    .withValues(alpha: 0.3),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -176,10 +176,10 @@ class _JoinMeetingPageState extends State<JoinMeetingPage> {
               // Cancel Button
               OutlinedButton(
                 onPressed: () => context.pop(),
-                child: const Text('Cancel'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
+                child: const Text('Cancel'),
               ),
               const SizedBox(height: 32),
 
@@ -228,7 +228,7 @@ class _JoinMeetingPageState extends State<JoinMeetingPage> {
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             shape: BoxShape.circle,
           ),
           child: Center(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../domain/entities/subscription_plan.dart';
 
 class PlanCard extends StatelessWidget {
@@ -32,9 +33,7 @@ class PlanCard extends StatelessWidget {
       elevation: plan.isPro ? 8 : 0,
       child: Container(
         decoration: BoxDecoration(
-          border: plan.isPro
-              ? Border.all(color: planColor, width: 2)
-              : null,
+          border: plan.isPro ? Border.all(color: planColor, width: 2) : null,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
@@ -59,7 +58,7 @@ class PlanCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: planColor.withOpacity(0.1),
+                        color: planColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -83,7 +82,7 @@ class PlanCard extends StatelessWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.6),
+                          .withValues(alpha: 0.6),
                     ),
               ),
               const SizedBox(height: 24),
@@ -108,7 +107,7 @@ class PlanCard extends StatelessWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(0.6),
+                                .withValues(alpha: 0.6),
                           ),
                     ),
                   ),
@@ -122,7 +121,7 @@ class PlanCard extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.6),
+                            .withValues(alpha: 0.6),
                       ),
                 ),
                 Text(
@@ -141,8 +140,7 @@ class PlanCard extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: isCurrentPlan ? null : onSubscribe,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isCurrentPlan ? Colors.grey : planColor,
+                    backgroundColor: isCurrentPlan ? Colors.grey : planColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
@@ -182,7 +180,7 @@ class PlanCard extends StatelessWidget {
                     ],
                   ),
                 );
-              }).toList(),
+              }),
 
               // Technical Limits
               const SizedBox(height: 16),
@@ -227,14 +225,16 @@ class PlanCard extends StatelessWidget {
         Icon(
           icon,
           size: 16,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         const SizedBox(width: 8),
         Text(
           text,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.6),
               ),
         ),
       ],

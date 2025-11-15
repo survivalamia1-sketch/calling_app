@@ -6,21 +6,21 @@ part 'meetings_state.freezed.dart';
 
 @freezed
 class MeetingsState with _$MeetingsState {
-  const factory MeetingsState.initial() = _Initial;
+  const factory MeetingsState.initial() = Initial;
 
-  const factory MeetingsState.loading() = _Loading;
+  const factory MeetingsState.loading() = Loading;
 
   const factory MeetingsState.loaded({
     required List<Meeting> meetings,
-  }) = _Loaded;
+  }) = Loaded;
 
   const factory MeetingsState.meetingCreated({
     required Meeting meeting,
-  }) = _MeetingCreated;
+  }) = MeetingCreated;
 
   const factory MeetingsState.joinedMeeting({
     required String roomId,
-  }) = _JoinedMeeting;
+  }) = JoinedMeeting;
 
-  const factory MeetingsState.error(Failure failure) = _Error;
+  const factory MeetingsState.error(Failure failure) = Error;
 }

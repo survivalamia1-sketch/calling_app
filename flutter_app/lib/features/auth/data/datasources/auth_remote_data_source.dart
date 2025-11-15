@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/user_model.dart';
@@ -61,20 +62,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'refresh_token': response.data['refresh_token'] as String?,
         };
       } else {
-        throw ServerException(response.data['message'] ?? 'Login failed');
+        throw ServerException(
+            message: response.data['message'] ?? 'Login failed');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
         throw UnauthorizedException(
-            e.response?.data['message'] ?? 'Invalid credentials');
+            message: e.response?.data['message'] ?? 'Invalid credentials');
       } else if (e.response?.statusCode == 403) {
         final message = e.response?.data['message'] ?? '';
         if (message.toLowerCase().contains('not verified')) {
-          throw UnauthorizedException(message);
+          throw UnauthorizedException(message: message);
         }
-        throw UnauthorizedException(message);
+        throw UnauthorizedException(message: message);
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -105,14 +107,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         };
       } else {
         throw ServerException(
-            response.data['message'] ?? 'Registration failed');
+            message: response.data['message'] ?? 'Registration failed');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 400) {
         throw ServerException(
-            e.response?.data['message'] ?? 'Invalid data');
+            message: e.response?.data['message'] ?? 'Invalid data');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -124,13 +126,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data['user']);
       } else {
-        throw ServerException('Failed to get user');
+        throw const ServerException(message: 'Failed to get user');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -143,10 +145,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode != 200) {
-        throw ServerException('Failed to send reset email');
+        throw const ServerException(message: 'Failed to send reset email');
       }
     } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -165,10 +167,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode != 200) {
-        throw ServerException('Failed to reset password');
+        throw const ServerException(message: 'Failed to reset password');
       }
     } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -178,10 +180,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final response = await client.post(ApiConstants.authResendVerification);
 
       if (response.statusCode != 200) {
-        throw ServerException('Failed to resend verification');
+        throw const ServerException(message: 'Failed to resend verification');
       }
     } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -200,14 +202,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode != 200) {
-        throw ServerException('Failed to change password');
+        throw const ServerException(message: 'Failed to change password');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 400) {
         throw ServerException(
-            e.response?.data['message'] ?? 'Invalid password');
+            message: e.response?.data['message'] ?? 'Invalid password');
       }
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 
@@ -222,10 +224,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data['user']);
       } else {
-        throw ServerException('Failed to update profile');
+        throw const ServerException(message: 'Failed to update profile');
       }
     } on DioException catch (e) {
-      throw ServerException(e.message ?? 'Network error');
+      throw ServerException(message: e.message ?? 'Network error');
     }
   }
 }

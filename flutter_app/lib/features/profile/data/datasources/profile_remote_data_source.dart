@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../models/profile_update_model.dart';
@@ -25,17 +26,17 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data['user']);
       } else {
-        throw ServerException(message: 'Failed to update profile');
+        throw const ServerException(message: 'Failed to update profile');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       throw ServerException(
         message: e.response?.data?['error'] ?? 'Server error occurred',
       );
     } catch (e) {
-      throw ServerException(message: 'Unexpected error occurred');
+      throw const ServerException(message: 'Unexpected error occurred');
     }
   }
 
@@ -48,11 +49,11 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       );
 
       if (response.statusCode != 200) {
-        throw ServerException(message: 'Failed to change password');
+        throw const ServerException(message: 'Failed to change password');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       if (e.response?.statusCode == 400) {
         throw ServerException(
@@ -63,7 +64,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         message: e.response?.data?['error'] ?? 'Server error occurred',
       );
     } catch (e) {
-      throw ServerException(message: 'Unexpected error occurred');
+      throw const ServerException(message: 'Unexpected error occurred');
     }
   }
 
@@ -75,17 +76,17 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data['user']);
       } else {
-        throw ServerException(message: 'Failed to get profile');
+        throw const ServerException(message: 'Failed to get profile');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       throw ServerException(
         message: e.response?.data?['error'] ?? 'Server error occurred',
       );
     } catch (e) {
-      throw ServerException(message: 'Unexpected error occurred');
+      throw const ServerException(message: 'Unexpected error occurred');
     }
   }
 }

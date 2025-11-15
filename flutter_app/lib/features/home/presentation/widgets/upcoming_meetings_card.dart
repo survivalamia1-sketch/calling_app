@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
 import '../../../meetings/domain/entities/meeting.dart';
 
 class UpcomingMeetingsCard extends StatelessWidget {
@@ -22,7 +23,10 @@ class UpcomingMeetingsCard extends StatelessWidget {
               Icon(
                 Icons.event_available,
                 size: 64,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.3),
               ),
               const SizedBox(height: 16),
               Text(
@@ -31,7 +35,7 @@ class UpcomingMeetingsCard extends StatelessWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.6),
+                          .withValues(alpha: 0.6),
                     ),
               ),
               const SizedBox(height: 8),
@@ -41,7 +45,7 @@ class UpcomingMeetingsCard extends StatelessWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withOpacity(0.4),
+                          .withValues(alpha: 0.4),
                     ),
               ),
               const SizedBox(height: 16),
@@ -81,9 +85,9 @@ class UpcomingMeetingsCard extends StatelessWidget {
 
     // Format the meeting time
     String formattedTime;
-    if (meeting.startTime != null) {
+    if (meeting.startedAt != null) {
       final now = DateTime.now();
-      final startTime = meeting.startTime!;
+      final startTime = meeting.startedAt!;
       final isToday = startTime.year == now.year &&
           startTime.month == now.month &&
           startTime.day == now.day;
@@ -142,8 +146,10 @@ class UpcomingMeetingsCard extends StatelessWidget {
                 Icon(
                   Icons.access_time,
                   size: 14,
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 4),
                 Expanded(
@@ -161,7 +167,7 @@ class UpcomingMeetingsCard extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.6),
+                        .withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 4),
                   Text('${meeting.maxParticipants} max'),
@@ -173,7 +179,7 @@ class UpcomingMeetingsCard extends StatelessWidget {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
+            color: statusColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(

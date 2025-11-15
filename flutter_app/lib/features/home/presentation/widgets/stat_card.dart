@@ -30,7 +30,7 @@ class StatCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -40,7 +40,7 @@ class StatCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                Icon(
+                const Icon(
                   Icons.trending_up,
                   color: Colors.green,
                   size: 20,
@@ -61,7 +61,7 @@ class StatCard extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.7),
+                        .withValues(alpha: 0.7),
                   ),
             ),
             const SizedBox(height: 4),
@@ -71,7 +71,7 @@ class StatCard extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.5),
+                        .withValues(alpha: 0.5),
                   ),
             ),
           ],

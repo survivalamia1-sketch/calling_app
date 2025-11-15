@@ -6,7 +6,7 @@ part 'meetings_event.freezed.dart';
 class MeetingsEvent with _$MeetingsEvent {
   const factory MeetingsEvent.loadMeetings({
     String? status,
-  }) = _LoadMeetings;
+  }) = LoadMeetings;
 
   const factory MeetingsEvent.createMeeting({
     required String title,
@@ -15,15 +15,15 @@ class MeetingsEvent with _$MeetingsEvent {
     int? duration,
     int? maxParticipants,
     bool? requiresApproval,
-  }) = _CreateMeeting;
+  }) = CreateMeeting;
 
   const factory MeetingsEvent.joinMeeting({
     required String roomCode,
-  }) = _JoinMeeting;
+  }) = JoinMeeting;
 
   const factory MeetingsEvent.deleteMeeting({
     required String id,
-  }) = _DeleteMeeting;
+  }) = DeleteMeeting;
 
-  const factory MeetingsEvent.refreshMeetings() = _RefreshMeetings;
+  const factory MeetingsEvent.refreshMeetings() = RefreshMeetings;
 }

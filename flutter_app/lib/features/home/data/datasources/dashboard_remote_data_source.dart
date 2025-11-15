@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../meetings/data/models/meeting_model.dart';
 import '../models/dashboard_stats_model.dart';
@@ -21,17 +22,16 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       if (response.statusCode == 200) {
         return DashboardStatsModel.fromJson(response.data);
       } else {
-        throw ServerException(message: 'Failed to load dashboard stats');
+        throw const ServerException(message: 'Failed to load dashboard stats');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       throw ServerException(
-        message: e.response?.data?['error'] ?? 'Server error occurred',
-      );
+          message: e.response?.data?['error'] ?? 'Server error occurred');
     } catch (e) {
-      throw ServerException(message: 'Unexpected error occurred');
+      throw const ServerException(message: 'Unexpected error occurred');
     }
   }
 
@@ -45,21 +45,20 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
       if (response.statusCode == 200) {
         final List<dynamic> meetingsJson = response.data['meetings'] ?? [];
-        return meetingsJson
-            .map((json) => MeetingModel.fromJson(json))
-            .toList();
+        return meetingsJson.map((json) => MeetingModel.fromJson(json)).toList();
       } else {
-        throw ServerException(message: 'Failed to load upcoming meetings');
+        throw const ServerException(
+            message: 'Failed to load upcoming meetings');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw UnauthorizedException();
+        throw const UnauthorizedException(message: 'Unauthorized');
       }
       throw ServerException(
         message: e.response?.data?['error'] ?? 'Server error occurred',
       );
     } catch (e) {
-      throw ServerException(message: 'Unexpected error occurred');
+      throw const ServerException(message: 'Unexpected error occurred');
     }
   }
 }

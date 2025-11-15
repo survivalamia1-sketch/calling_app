@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/di/injection.dart';
 import '../bloc/meetings_bloc.dart';
+import '../bloc/meetings_event.dart';
+import '../bloc/meetings_state.dart';
 import '../widgets/meeting_card.dart';
 
 class MeetingsListPage extends StatelessWidget {
@@ -11,8 +14,8 @@ class MeetingsListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<MeetingsBloc>()
-        ..add(const MeetingsEvent.loadMeetings()),
+      create: (context) =>
+          getIt<MeetingsBloc>()..add(const MeetingsEvent.loadMeetings()),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Meetings'),
@@ -59,7 +62,7 @@ class MeetingsListPage extends StatelessWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -74,7 +77,7 @@ class MeetingsListPage extends StatelessWidget {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurface
-                                        .withOpacity(0.6),
+                                        .withValues(alpha: 0.6),
                                   ),
                         ),
                         const SizedBox(height: 24),

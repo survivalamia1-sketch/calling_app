@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/settings.dart';
@@ -21,7 +22,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on CacheException catch (e) {
       return Left(CacheFailure(message: e.message));
     } catch (e) {
-      return Left(CacheFailure(message: 'Unexpected error occurred'));
+      return const Left(CacheFailure(message: 'Unexpected error occurred'));
     }
   }
 
@@ -34,7 +35,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on CacheException catch (e) {
       return Left(CacheFailure(message: e.message));
     } catch (e) {
-      return Left(CacheFailure(message: 'Failed to update settings'));
+      return const Left(CacheFailure(message: 'Failed to update settings'));
     }
   }
 
@@ -46,7 +47,7 @@ class SettingsRepositoryImpl implements SettingsRepository {
     } on CacheException catch (e) {
       return Left(CacheFailure(message: e.message));
     } catch (e) {
-      return Left(CacheFailure(message: 'Failed to reset settings'));
+      return const Left(CacheFailure(message: 'Failed to reset settings'));
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/di/injection.dart';
 import '../bloc/settings_bloc.dart';
 
@@ -218,7 +219,8 @@ class SettingsPage extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Privacy settings coming soon')),
+                    const SnackBar(
+                        content: Text('Privacy settings coming soon')),
                   );
                 },
               ),
@@ -245,10 +247,10 @@ class SettingsPage extends StatelessWidget {
         Card(
           child: Column(
             children: [
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: const Text('App Version'),
-                subtitle: const Text('1.0.0'),
+              const ListTile(
+                leading: Icon(Icons.info_outline),
+                title: Text('App Version'),
+                subtitle: Text('1.0.0'),
               ),
               const Divider(height: 1),
               ListTile(
@@ -257,7 +259,8 @@ class SettingsPage extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Opening Terms of Service...')),
+                    const SnackBar(
+                        content: Text('Opening Terms of Service...')),
                   );
                 },
               ),
@@ -314,9 +317,7 @@ class SettingsPage extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            RadioListTile<String>(
-              title: const Text('System Default'),
-              value: 'system',
+            RadioGroup<String>(
               groupValue: currentTheme,
               onChanged: (value) {
                 if (value != null) {
@@ -326,10 +327,9 @@ class SettingsPage extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 }
               },
+              child: const Text('System Default'),
             ),
-            RadioListTile<String>(
-              title: const Text('Light'),
-              value: 'light',
+            RadioGroup<String>(
               groupValue: currentTheme,
               onChanged: (value) {
                 if (value != null) {
@@ -339,10 +339,9 @@ class SettingsPage extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 }
               },
+              child: const Text('Light'),
             ),
-            RadioListTile<String>(
-              title: const Text('Dark'),
-              value: 'dark',
+            RadioGroup<String>(
               groupValue: currentTheme,
               onChanged: (value) {
                 if (value != null) {
@@ -352,6 +351,7 @@ class SettingsPage extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 }
               },
+              child: const Text('Dark'),
             ),
           ],
         ),
@@ -367,10 +367,7 @@ class SettingsPage extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            RadioListTile<String>(
-              title: const Text('HD (1080p)'),
-              subtitle: const Text('Best quality, more data'),
-              value: 'HD',
+            RadioGroup<String>(
               groupValue: currentQuality,
               onChanged: (value) {
                 if (value != null) {
@@ -380,11 +377,9 @@ class SettingsPage extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 }
               },
+              child: const Text('HD (1080p)'),
             ),
-            RadioListTile<String>(
-              title: const Text('SD (720p)'),
-              subtitle: const Text('Balanced'),
-              value: 'SD',
+            RadioGroup<String>(
               groupValue: currentQuality,
               onChanged: (value) {
                 if (value != null) {
@@ -394,11 +389,9 @@ class SettingsPage extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 }
               },
+              child: const Text('SD (720p)'),
             ),
-            RadioListTile<String>(
-              title: const Text('Low (480p)'),
-              subtitle: const Text('Save data'),
-              value: 'Low',
+            RadioGroup<String>(
               groupValue: currentQuality,
               onChanged: (value) {
                 if (value != null) {
@@ -408,6 +401,7 @@ class SettingsPage extends StatelessWidget {
                   Navigator.pop(dialogContext);
                 }
               },
+              child: const Text('Low (480p)'),
             ),
           ],
         ),

@@ -1,6 +1,9 @@
+import 'package:calling_app/features/auth/presentation/bloc/auth_event.dart';
+import 'package:calling_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/di/injection.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../domain/entities/profile_update.dart';
@@ -235,8 +238,7 @@ class ProfilePage extends StatelessWidget {
 
     authState.maybeWhen(
       authenticated: (user) {
-        final firstNameController =
-            TextEditingController(text: user.firstName);
+        final firstNameController = TextEditingController(text: user.firstName);
         final lastNameController = TextEditingController(text: user.lastName);
 
         showDialog(

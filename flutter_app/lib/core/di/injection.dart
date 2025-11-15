@@ -4,8 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
-import '../constants/api_constants.dart';
-import '../network/network_info.dart';
 import '../../features/auth/data/datasources/auth_local_data_source.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
@@ -15,46 +13,6 @@ import '../../features/auth/domain/usecases/login.dart';
 import '../../features/auth/domain/usecases/logout.dart';
 import '../../features/auth/domain/usecases/register.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/meetings/data/datasources/meetings_remote_data_source.dart';
-import '../../features/meetings/data/repositories/meetings_repository_impl.dart';
-import '../../features/meetings/domain/repositories/meetings_repository.dart';
-import '../../features/meetings/domain/usecases/create_meeting.dart';
-import '../../features/meetings/domain/usecases/get_meetings.dart';
-import '../../features/meetings/domain/usecases/join_meeting.dart';
-import '../../features/meetings/presentation/bloc/meetings_bloc.dart';
-import '../../features/subscriptions/data/datasources/subscriptions_remote_data_source.dart';
-import '../../features/subscriptions/data/repositories/subscriptions_repository_impl.dart';
-import '../../features/subscriptions/domain/repositories/subscriptions_repository.dart';
-import '../../features/subscriptions/domain/usecases/create_checkout_session.dart';
-import '../../features/subscriptions/domain/usecases/get_current_subscription.dart';
-import '../../features/subscriptions/domain/usecases/get_plans.dart';
-import '../../features/subscriptions/presentation/bloc/subscriptions_bloc.dart';
-import '../../features/home/data/datasources/dashboard_remote_data_source.dart';
-import '../../features/home/data/repositories/dashboard_repository_impl.dart';
-import '../../features/home/domain/repositories/dashboard_repository.dart';
-import '../../features/home/domain/usecases/get_dashboard_stats.dart';
-import '../../features/home/domain/usecases/get_upcoming_meetings.dart';
-import '../../features/home/presentation/bloc/dashboard_bloc.dart';
-import '../../features/settings/data/datasources/settings_local_data_source.dart';
-import '../../features/settings/data/models/settings_model.dart';
-import '../../features/settings/data/repositories/settings_repository_impl.dart';
-import '../../features/settings/domain/repositories/settings_repository.dart';
-import '../../features/settings/domain/usecases/get_settings.dart';
-import '../../features/settings/domain/usecases/reset_settings.dart';
-import '../../features/settings/domain/usecases/update_settings.dart';
-import '../../features/settings/presentation/bloc/settings_bloc.dart';
-import '../../features/profile/data/datasources/profile_remote_data_source.dart';
-import '../../features/profile/data/repositories/profile_repository_impl.dart';
-import '../../features/profile/domain/repositories/profile_repository.dart';
-import '../../features/profile/domain/usecases/change_password.dart';
-import '../../features/profile/domain/usecases/update_profile.dart';
-import '../../features/profile/presentation/bloc/profile_bloc.dart';
-import '../../features/support/data/datasources/support_remote_data_source.dart';
-import '../../features/support/data/repositories/support_repository_impl.dart';
-import '../../features/support/domain/repositories/support_repository.dart';
-import '../../features/support/domain/usecases/get_faqs.dart';
-import '../../features/support/domain/usecases/submit_bug_report.dart';
-import '../../features/support/presentation/bloc/support_bloc.dart';
 import '../../features/call/data/repositories/call_repository_impl.dart';
 import '../../features/call/data/services/signaling_service.dart';
 import '../../features/call/data/services/webrtc_service.dart';
@@ -65,6 +23,51 @@ import '../../features/call/domain/usecases/switch_camera.dart';
 import '../../features/call/domain/usecases/toggle_audio.dart';
 import '../../features/call/domain/usecases/toggle_video.dart';
 import '../../features/call/presentation/bloc/call_bloc.dart';
+import '../../features/home/data/datasources/dashboard_remote_data_source.dart';
+import '../../features/home/data/repositories/dashboard_repository_impl.dart';
+import '../../features/home/domain/repositories/dashboard_repository.dart';
+import '../../features/home/domain/usecases/get_dashboard_stats.dart';
+import '../../features/home/domain/usecases/get_upcoming_meetings.dart';
+import '../../features/home/presentation/bloc/dashboard_bloc.dart';
+import '../../features/meetings/data/datasources/meetings_remote_data_source.dart';
+import '../../features/meetings/data/repositories/meetings_repository_impl.dart';
+import '../../features/meetings/domain/repositories/meetings_repository.dart';
+import '../../features/meetings/domain/usecases/create_meeting.dart';
+import '../../features/meetings/domain/usecases/get_meetings.dart';
+import '../../features/meetings/domain/usecases/join_meeting.dart';
+import '../../features/meetings/presentation/bloc/meetings_bloc.dart';
+import '../../features/profile/data/datasources/profile_remote_data_source.dart';
+import '../../features/profile/data/repositories/profile_repository_impl.dart';
+import '../../features/profile/domain/repositories/profile_repository.dart';
+import '../../features/profile/domain/usecases/change_password.dart'
+    as change_password;
+import '../../features/profile/domain/usecases/update_profile.dart'
+    as update_profile;
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/settings/data/datasources/settings_local_data_source.dart';
+import '../../features/settings/data/models/settings_model.dart';
+import '../../features/settings/data/repositories/settings_repository_impl.dart';
+import '../../features/settings/domain/repositories/settings_repository.dart';
+import '../../features/settings/domain/usecases/get_settings.dart';
+import '../../features/settings/domain/usecases/reset_settings.dart';
+import '../../features/settings/domain/usecases/update_settings.dart';
+import '../../features/settings/presentation/bloc/settings_bloc.dart';
+import '../../features/subscriptions/data/datasources/subscriptions_remote_data_source.dart';
+import '../../features/subscriptions/data/repositories/subscriptions_repository_impl.dart';
+import '../../features/subscriptions/domain/repositories/subscriptions_repository.dart';
+import '../../features/subscriptions/domain/usecases/create_checkout_session.dart';
+import '../../features/subscriptions/domain/usecases/get_current_subscription.dart';
+import '../../features/subscriptions/domain/usecases/get_plans.dart';
+import '../../features/subscriptions/presentation/bloc/subscriptions_bloc.dart';
+import '../../features/support/data/datasources/support_remote_data_source.dart';
+import '../../features/support/data/repositories/support_repository_impl.dart';
+import '../../features/support/domain/repositories/support_repository.dart';
+import '../../features/support/domain/usecases/get_faqs.dart';
+import '../../features/support/domain/usecases/submit_bug_report.dart';
+import '../../features/support/presentation/bloc/support_bloc.dart'
+    hide SubmitBugReport;
+import '../constants/api_constants.dart';
+import '../network/network_info.dart';
 
 final getIt = GetIt.instance;
 
@@ -293,8 +296,8 @@ Future<void> configureDependencies() async {
   );
 
   // Use cases
-  getIt.registerLazySingleton(() => UpdateProfile(getIt()));
-  getIt.registerLazySingleton(() => ChangePassword(getIt()));
+  getIt.registerLazySingleton(() => update_profile.UpdateProfile(getIt()));
+  getIt.registerLazySingleton(() => change_password.ChangePassword(getIt()));
 
   // Bloc
   getIt.registerFactory(

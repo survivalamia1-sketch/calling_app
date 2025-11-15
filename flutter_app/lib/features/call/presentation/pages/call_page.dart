@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/di/injection.dart';
-import '../bloc/call_bloc.dart';
+
 import '../../domain/entities/call.dart';
+import '../bloc/call_bloc.dart';
 
 class CallPage extends StatefulWidget {
   final String roomId;
@@ -195,7 +195,8 @@ class _CallPageState extends State<CallPage> {
     );
   }
 
-  Widget _buildLocalVideo(RTCVideoRenderer renderer, {required bool isMainView}) {
+  Widget _buildLocalVideo(RTCVideoRenderer renderer,
+      {required bool isMainView}) {
     return Container(
       width: isMainView ? double.infinity : 120,
       height: isMainView ? double.infinity : 160,
@@ -205,7 +206,8 @@ class _CallPageState extends State<CallPage> {
         border: isMainView ? null : Border.all(color: Colors.white, width: 2),
       ),
       child: ClipRRect(
-        borderRadius: isMainView ? BorderRadius.zero : BorderRadius.circular(10),
+        borderRadius:
+            isMainView ? BorderRadius.zero : BorderRadius.circular(10),
         child: RTCVideoView(
           renderer,
           objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
@@ -247,7 +249,7 @@ class _CallPageState extends State<CallPage> {
               color: Colors.white38,
             ),
             const SizedBox(width: 12),
-            Icon(
+            const Icon(
               Icons.people,
               color: Colors.white70,
               size: 16,
@@ -269,7 +271,7 @@ class _CallPageState extends State<CallPage> {
   Widget _buildControls(BuildContext context, Call call) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
@@ -291,7 +293,7 @@ class _CallPageState extends State<CallPage> {
             },
             backgroundColor: call.isAudioEnabled
                 ? Colors.white24
-                : Colors.red.withOpacity(0.8),
+                : Colors.red.withValues(alpha: 0.8),
           ),
           _buildControlButton(
             icon: call.isVideoEnabled ? Icons.videocam : Icons.videocam_off,
@@ -301,7 +303,7 @@ class _CallPageState extends State<CallPage> {
             },
             backgroundColor: call.isVideoEnabled
                 ? Colors.white24
-                : Colors.red.withOpacity(0.8),
+                : Colors.red.withValues(alpha: 0.8),
           ),
           _buildControlButton(
             icon: Icons.flip_camera_ios,

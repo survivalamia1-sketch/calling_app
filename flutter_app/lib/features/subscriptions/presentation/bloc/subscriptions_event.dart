@@ -4,20 +4,20 @@ part 'subscriptions_event.freezed.dart';
 
 @freezed
 class SubscriptionsEvent with _$SubscriptionsEvent {
-  const factory SubscriptionsEvent.loadPlans() = _LoadPlans;
+  const factory SubscriptionsEvent.loadPlans() = LoadPlans;
 
   const factory SubscriptionsEvent.loadCurrentSubscription() =
-      _LoadCurrentSubscription;
+      LoadCurrentSubscription;
 
   const factory SubscriptionsEvent.subscribe({
     required String planId,
     required String billingCycle,
-  }) = _Subscribe;
+  }) = Subscribe;
 
-  const factory SubscriptionsEvent.cancelSubscription() = _CancelSubscription;
+  const factory SubscriptionsEvent.cancelSubscription() = CancelSubscription;
 
   const factory SubscriptionsEvent.updateSubscription({
     required String planId,
     required String billingCycle,
-  }) = _UpdateSubscription;
+  }) = UpdateSubscription;
 }

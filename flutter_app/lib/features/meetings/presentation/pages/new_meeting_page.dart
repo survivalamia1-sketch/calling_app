@@ -1,8 +1,10 @@
+import 'package:calling_app/features/meetings/presentation/bloc/meetings_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../domain/entities/meeting.dart';
+
 import '../bloc/meetings_bloc.dart';
+import '../bloc/meetings_event.dart';
 
 class NewMeetingPage extends StatefulWidget {
   const NewMeetingPage({super.key});
@@ -37,9 +39,7 @@ class _NewMeetingPageState extends State<NewMeetingPage> {
     context.read<MeetingsBloc>().add(
           MeetingsEvent.createMeeting(
             title: _titleController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty
-                ? null
-                : _descriptionController.text.trim(),
+            description: _descriptionController.text.trim(),
             scheduledAt: DateTime.now(),
           ),
         );
@@ -60,15 +60,15 @@ class _NewMeetingPageState extends State<NewMeetingPage> {
           state.whenOrNull(
             meetingCreated: (meeting) {
               // Navigate to call page with the new meeting's room ID
-              context.go('/call/${meeting.roomId}');
+              context.go('/call/${meeting.id}');
             },
-            error: (message) {
+            error: (failure) {
               setState(() {
                 _isCreating = false;
               });
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(message),
+                  content: Text(failure.message),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -145,7 +145,7 @@ class _NewMeetingPageState extends State<NewMeetingPage> {
                     color: Theme.of(context)
                         .colorScheme
                         .primaryContainer
-                        .withOpacity(0.3),
+                        .withValues(alpha: 0.3),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -218,10 +218,10 @@ class _NewMeetingPageState extends State<NewMeetingPage> {
                   // Cancel Button
                   OutlinedButton(
                     onPressed: _isCreating ? null : () => context.pop(),
-                    child: const Text('Cancel'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
+                    child: const Text('Cancel'),
                   ),
                 ],
               ),

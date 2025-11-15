@@ -4,11 +4,11 @@ part of 'profile_bloc.dart';
 class ProfileEvent with _$ProfileEvent {
   const factory ProfileEvent.updateProfile({
     required ProfileUpdate profileUpdate,
-  }) = _UpdateProfile;
+  }) = UpdateProfile;
 
   const factory ProfileEvent.changePassword({
     required PasswordChange passwordChange,
-  }) = _ChangePassword;
+  }) = ChangePassword;
 
-  const factory ProfileEvent.loadProfile() = _LoadProfile;
+  const factory ProfileEvent.loadProfile() = LoadProfile;
 }

@@ -174,8 +174,8 @@ class _MainShellPageState extends State<MainShellPage> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          child: const Icon(Icons.person),
+                        leading: const CircleAvatar(
+                          child: Icon(Icons.person),
                         ),
                         title: const Text('User Name'),
                         subtitle: const Text('user@example.com'),

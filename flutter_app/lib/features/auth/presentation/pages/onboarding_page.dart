@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../widgets/custom_button.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -115,7 +116,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           : Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -183,8 +184,10 @@ class OnboardingPageItem extends StatelessWidget {
           Text(
             data.description,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
                 ),
             textAlign: TextAlign.center,
           ),

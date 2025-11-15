@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/create_checkout_session.dart';
 import '../../domain/usecases/get_current_subscription.dart';
@@ -16,13 +17,13 @@ class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionsState> {
     required this.getCurrentSubscriptionUseCase,
     required this.createCheckoutSessionUseCase,
   }) : super(const SubscriptionsState.initial()) {
-    on<_LoadPlans>(_onLoadPlans);
-    on<_LoadCurrentSubscription>(_onLoadCurrentSubscription);
-    on<_Subscribe>(_onSubscribe);
+    on<LoadPlans>(_onLoadPlans);
+    on<LoadCurrentSubscription>(_onLoadCurrentSubscription);
+    on<Subscribe>(_onSubscribe);
   }
 
   Future<void> _onLoadPlans(
-    _LoadPlans event,
+    LoadPlans event,
     Emitter<SubscriptionsState> emit,
   ) async {
     emit(const SubscriptionsState.loading());
@@ -48,7 +49,7 @@ class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionsState> {
   }
 
   Future<void> _onLoadCurrentSubscription(
-    _LoadCurrentSubscription event,
+    LoadCurrentSubscription event,
     Emitter<SubscriptionsState> emit,
   ) async {
     emit(const SubscriptionsState.loading());
@@ -57,13 +58,13 @@ class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionsState> {
 
     result.fold(
       (failure) => emit(SubscriptionsState.error(failure)),
-      (subscription) =>
-          emit(SubscriptionsState.subscriptionUpdated(subscription: subscription)),
+      (subscription) => emit(
+          SubscriptionsState.subscriptionUpdated(subscription: subscription)),
     );
   }
 
   Future<void> _onSubscribe(
-    _Subscribe event,
+    Subscribe event,
     Emitter<SubscriptionsState> emit,
   ) async {
     emit(const SubscriptionsState.loading());
@@ -75,8 +76,8 @@ class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionsState> {
 
     result.fold(
       (failure) => emit(SubscriptionsState.error(failure)),
-      (checkoutUrl) =>
-          emit(SubscriptionsState.checkoutUrlGenerated(checkoutUrl: checkoutUrl)),
+      (checkoutUrl) => emit(
+          SubscriptionsState.checkoutUrlGenerated(checkoutUrl: checkoutUrl)),
     );
   }
 }

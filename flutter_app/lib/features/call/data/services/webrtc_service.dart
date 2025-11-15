@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 class WebRTCService {
@@ -85,9 +86,7 @@ class WebRTCService {
 
     // ICE candidate
     _peerConnection!.onIceCandidate = (candidate) {
-      if (candidate != null) {
-        onIceCandidate(candidate);
-      }
+      onIceCandidate(candidate);
     };
 
     // Add remote stream

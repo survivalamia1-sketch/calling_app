@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 abstract class Failure extends Equatable {
   final String message;
 
-  const Failure(this.message);
+  const Failure({required this.message});
 
   @override
   List<Object> get props => [message];
@@ -11,31 +11,29 @@ abstract class Failure extends Equatable {
 
 // General failures
 class ServerFailure extends Failure {
-  const ServerFailure([String message = 'Server error occurred']) : super(message);
+  const ServerFailure({required super.message});
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure([String message = 'Cache error occurred']) : super(message);
+  const CacheFailure({required super.message});
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([String message = 'Network error occurred. Please check your connection.'])
-      : super(message);
+  const NetworkFailure({required super.message});
 }
 
 class ValidationFailure extends Failure {
-  const ValidationFailure([String message = 'Validation failed']) : super(message);
+  const ValidationFailure({required super.message});
 }
 
 class UnauthorizedFailure extends Failure {
-  const UnauthorizedFailure([String message = 'Unauthorized. Please login again.'])
-      : super(message);
+  const UnauthorizedFailure({required super.message});
 }
 
 class NotFoundFailure extends Failure {
-  const NotFoundFailure([String message = 'Resource not found']) : super(message);
+  const NotFoundFailure({required super.message});
 }
 
 class UnknownFailure extends Failure {
-  const UnknownFailure([String message = 'An unknown error occurred']) : super(message);
+  const UnknownFailure({required super.message});
 }

@@ -1,20 +1,22 @@
 import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../../../../core/usecases/usecase.dart';
+import '../../data/services/webrtc_service.dart';
 import '../../domain/entities/call.dart';
+import '../../domain/repositories/call_repository.dart';
 import '../../domain/usecases/join_call.dart';
 import '../../domain/usecases/leave_call.dart';
 import '../../domain/usecases/switch_camera.dart';
 import '../../domain/usecases/toggle_audio.dart';
 import '../../domain/usecases/toggle_video.dart';
-import '../../domain/repositories/call_repository.dart';
-import '../../data/services/webrtc_service.dart';
 
+part 'call_bloc.freezed.dart';
 part 'call_event.dart';
 part 'call_state.dart';
-part 'call_bloc.freezed.dart';
 
 class CallBloc extends Bloc<CallEvent, CallState> {
   final JoinCall joinCall;
@@ -65,7 +67,7 @@ class CallBloc extends Bloc<CallEvent, CallState> {
 
     result.fold(
       (failure) => emit(CallState.error(
-        message: failure.message ?? 'Failed to join call',
+        message: failure.message,
       )),
       (call) {
         // Listen to call updates
@@ -129,11 +131,11 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     _LeaveCall event,
     Emitter<CallState> emit,
   ) async {
-    final result = await leaveCall(const NoParams());
+    final result = await leaveCall(NoParams());
 
     result.fold(
       (failure) => emit(CallState.error(
-        message: failure.message ?? 'Failed to leave call',
+        message: failure.message,
       )),
       (_) {
         _cleanup();
@@ -157,7 +159,7 @@ class CallBloc extends Bloc<CallEvent, CallState> {
 
     result.fold(
       (failure) => emit(CallState.error(
-        message: failure.message ?? 'Failed to toggle audio',
+        message: failure.message,
       )),
       (_) {
         // State will be updated via call stream
@@ -180,7 +182,7 @@ class CallBloc extends Bloc<CallEvent, CallState> {
 
     result.fold(
       (failure) => emit(CallState.error(
-        message: failure.message ?? 'Failed to toggle video',
+        message: failure.message,
       )),
       (_) {
         // State will be updated via call stream
@@ -192,11 +194,11 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     _SwitchCamera event,
     Emitter<CallState> emit,
   ) async {
-    final result = await switchCamera(const NoParams());
+    final result = await switchCamera(NoParams());
 
     result.fold(
       (failure) => emit(CallState.error(
-        message: failure.message ?? 'Failed to switch camera',
+        message: failure.message,
       )),
       (_) {
         // Camera switched successfully

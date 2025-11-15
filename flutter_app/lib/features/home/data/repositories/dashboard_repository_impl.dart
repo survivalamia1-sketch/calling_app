@@ -23,12 +23,12 @@ class DashboardRepositoryImpl implements DashboardRepository {
         final stats = await remoteDataSource.getDashboardStats();
         return Right(stats.toDomain());
       } on UnauthorizedException {
-        return Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
         return Left(ServerFailure(message: e.message));
       }
     } else {
-      return Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -42,12 +42,12 @@ class DashboardRepositoryImpl implements DashboardRepository {
             await remoteDataSource.getUpcomingMeetings(limit: limit);
         return Right(meetings.map((model) => model.toDomain()).toList());
       } on UnauthorizedException {
-        return Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
         return Left(ServerFailure(message: e.message));
       }
     } else {
-      return Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 }

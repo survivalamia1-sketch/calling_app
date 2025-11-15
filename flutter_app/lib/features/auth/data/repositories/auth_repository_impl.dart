@@ -43,12 +43,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
         return Right(user.toDomain());
       } on UnauthorizedException catch (e) {
-        return Left(UnauthorizedFailure(e.message));
+        return Left(UnauthorizedFailure(message: e.message));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -81,10 +81,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
         return Right(user.toDomain());
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -96,10 +96,10 @@ class AuthRepositoryImpl implements AuthRepository {
         await localDataSource.cacheUser(user);
         return Right(user.toDomain());
       } on UnauthorizedException {
-        return const Left(
-            UnauthorizedFailure('Session expired. Please login again.'));
+        return const Left(UnauthorizedFailure(
+            message: 'Session expired. Please login again.'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
       // Return cached user if no network
@@ -107,7 +107,7 @@ class AuthRepositoryImpl implements AuthRepository {
         final user = await localDataSource.getLastUser();
         return Right(user.toDomain());
       } on CacheException {
-        return const Left(CacheFailure('No cached user data'));
+        return const Left(CacheFailure(message: 'No cached user data'));
       }
     }
   }
@@ -118,7 +118,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await localDataSource.clearAuth();
       return const Right(null);
     } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
+      return Left(CacheFailure(message: e.message));
     }
   }
 
@@ -129,10 +129,10 @@ class AuthRepositoryImpl implements AuthRepository {
         await remoteDataSource.forgotPassword(email: email);
         return const Right(null);
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -149,10 +149,10 @@ class AuthRepositoryImpl implements AuthRepository {
         );
         return const Right(null);
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -163,10 +163,10 @@ class AuthRepositoryImpl implements AuthRepository {
         await remoteDataSource.resendVerificationEmail();
         return const Right(null);
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -183,10 +183,10 @@ class AuthRepositoryImpl implements AuthRepository {
         );
         return const Right(null);
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -200,10 +200,10 @@ class AuthRepositoryImpl implements AuthRepository {
         await localDataSource.cacheUser(user);
         return Right(user.toDomain());
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 

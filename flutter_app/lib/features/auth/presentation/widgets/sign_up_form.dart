@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+
 import '../bloc/auth_bloc.dart';
-import 'custom_text_field.dart';
+import '../bloc/auth_event.dart';
 import 'custom_button.dart';
+import 'custom_text_field.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -85,7 +87,7 @@ class _SignUpFormState extends State<SignUpForm> {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.6),
+                            .withValues(alpha: 0.6),
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -231,8 +233,9 @@ class _SignUpFormState extends State<SignUpForm> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     TextButton(
-                      onPressed:
-                          isLoading ? null : () => context.push('/auth/sign-in'),
+                      onPressed: isLoading
+                          ? null
+                          : () => context.push('/auth/sign-in'),
                       child: const Text('Sign In'),
                     ),
                   ],

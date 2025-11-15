@@ -1,14 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../../../../core/usecases/usecase.dart';
 import '../../../meetings/domain/entities/meeting.dart';
 import '../../domain/entities/dashboard_stats.dart';
 import '../../domain/usecases/get_dashboard_stats.dart';
 import '../../domain/usecases/get_upcoming_meetings.dart';
 
+part 'dashboard_bloc.freezed.dart';
 part 'dashboard_event.dart';
 part 'dashboard_state.dart';
-part 'dashboard_bloc.freezed.dart';
 
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   final GetDashboardStats getDashboardStats;
@@ -48,7 +49,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     await statsResult.fold(
       (failure) async {
         emit(DashboardState.error(
-          message: failure.message ?? 'Failed to load dashboard',
+          message: failure.message,
         ));
       },
       (stats) async {

@@ -1,6 +1,9 @@
+import 'package:calling_app/features/subscriptions/presentation/bloc/subscriptions_event.dart';
+import 'package:calling_app/features/subscriptions/presentation/bloc/subscriptions_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../../../core/di/injection.dart';
 import '../bloc/subscriptions_bloc.dart';
 import '../widgets/plan_card.dart';
@@ -18,8 +21,8 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<SubscriptionsBloc>()
-        ..add(const SubscriptionsEvent.loadPlans()),
+      create: (context) =>
+          getIt<SubscriptionsBloc>()..add(const SubscriptionsEvent.loadPlans()),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Subscription Plans'),
@@ -67,7 +70,7 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -148,8 +151,8 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                           decoration: BoxDecoration(
                             color: Theme.of(context)
                                 .colorScheme
-                                .surfaceVariant
-                                .withOpacity(0.5),
+                                .surfaceContainerHighest
+                                .withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           padding: const EdgeInsets.all(4),
@@ -189,8 +192,9 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                                     child: PlanCard(
                                       plan: plan,
                                       isYearly: _isYearly,
-                                      isCurrentPlan: currentSubscription?.planId ==
-                                          plan.id,
+                                      isCurrentPlan:
+                                          currentSubscription?.planId ==
+                                              plan.id,
                                       onSubscribe: () {
                                         _handleSubscribe(context, plan.id);
                                       },

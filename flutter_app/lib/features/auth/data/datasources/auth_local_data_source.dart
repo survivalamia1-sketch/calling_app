@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/error/exceptions.dart';
 import '../models/user_model.dart';
@@ -34,7 +36,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     if (jsonString != null) {
       return UserModel.fromJson(jsonDecode(jsonString));
     }
-    throw CacheException('No user found in cache');
+    throw const CacheException(message: 'No user found in cache');
   }
 
   @override
@@ -48,13 +50,12 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     if (token != null) {
       return token;
     }
-    throw CacheException('No token found');
+    throw const CacheException(message: 'No token found');
   }
 
   @override
   Future<void> cacheRefreshToken(String refreshToken) async {
-    await storage.write(
-        key: AppConstants.refreshTokenKey, value: refreshToken);
+    await storage.write(key: AppConstants.refreshTokenKey, value: refreshToken);
   }
 
   @override

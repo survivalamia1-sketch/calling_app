@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/network_info.dart';
@@ -22,10 +23,10 @@ class SubscriptionsRepositoryImpl implements SubscriptionsRepository {
         final plans = await remoteDataSource.getPlans();
         return Right(plans.map((model) => model.toDomain()).toList());
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -36,12 +37,12 @@ class SubscriptionsRepositoryImpl implements SubscriptionsRepository {
         final subscription = await remoteDataSource.getCurrentSubscription();
         return Right(subscription.toDomain());
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -58,12 +59,12 @@ class SubscriptionsRepositoryImpl implements SubscriptionsRepository {
         );
         return Right(url);
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -74,12 +75,12 @@ class SubscriptionsRepositoryImpl implements SubscriptionsRepository {
         await remoteDataSource.cancelSubscription();
         return const Right(null);
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -96,12 +97,12 @@ class SubscriptionsRepositoryImpl implements SubscriptionsRepository {
         );
         return Right(subscription.toDomain());
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 }

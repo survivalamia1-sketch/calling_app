@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/network_info.dart';
@@ -30,12 +31,12 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         );
         return Right(meetings.map((model) => model.toDomain()).toList());
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -46,12 +47,12 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         final meeting = await remoteDataSource.getMeetingById(id);
         return Right(meeting.toDomain());
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -62,10 +63,10 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         final meeting = await remoteDataSource.getMeetingByCode(code);
         return Right(meeting.toDomain());
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -90,12 +91,12 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         );
         return Right(meeting.toDomain());
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -122,12 +123,12 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         );
         return Right(meeting.toDomain());
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -138,12 +139,12 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         await remoteDataSource.deleteMeeting(id);
         return const Right(null);
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -154,12 +155,12 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         final roomId = await remoteDataSource.joinMeeting(roomCode);
         return Right(roomId);
       } on UnauthorizedException {
-        return const Left(UnauthorizedFailure());
+        return const Left(UnauthorizedFailure(message: 'Unauthorized'));
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 
@@ -170,10 +171,10 @@ class MeetingsRepositoryImpl implements MeetingsRepository {
         await remoteDataSource.leaveMeeting(roomId);
         return const Right(null);
       } on ServerException catch (e) {
-        return Left(ServerFailure(e.message));
+        return Left(ServerFailure(message: e.message));
       }
     } else {
-      return const Left(NetworkFailure());
+      return const Left(NetworkFailure(message: 'Network error'));
     }
   }
 }

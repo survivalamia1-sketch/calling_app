@@ -1,25 +1,31 @@
+import 'package:calling_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:calling_app/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:calling_app/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:calling_app/features/subscriptions/presentation/bloc/subscriptions_bloc.dart';
+import 'package:calling_app/features/support/presentation/bloc/support_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../di/injection.dart';
+
 import '../../features/auth/domain/repositories/auth_repository.dart';
+import '../../features/auth/presentation/pages/email_verification_page.dart';
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../features/auth/presentation/pages/sign_up_page.dart';
-import '../../features/auth/presentation/pages/email_verification_page.dart';
-import '../../features/auth/presentation/pages/forgot_password_page.dart';
-import '../../features/shell/presentation/pages/main_shell_page.dart';
+import '../../features/call/presentation/bloc/call_bloc.dart';
+import '../../features/call/presentation/pages/call_page.dart';
 import '../../features/home/presentation/pages/home_dashboard_page.dart';
+import '../../features/meetings/presentation/bloc/meetings_bloc.dart';
+import '../../features/meetings/presentation/pages/join_meeting_page.dart';
 import '../../features/meetings/presentation/pages/meetings_list_page.dart';
 import '../../features/meetings/presentation/pages/new_meeting_page.dart';
-import '../../features/meetings/presentation/pages/join_meeting_page.dart';
-import '../../features/meetings/presentation/bloc/meetings_bloc.dart';
-import '../../features/subscriptions/presentation/pages/subscription_plans_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/shell/presentation/pages/main_shell_page.dart';
+import '../../features/subscriptions/presentation/pages/subscription_plans_page.dart';
 import '../../features/support/presentation/pages/support_page.dart';
-import '../../features/call/presentation/pages/call_page.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../features/call/presentation/bloc/call_bloc.dart';
+import '../di/injection.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -53,19 +59,31 @@ class AppRouter {
       // Auth Routes
       GoRoute(
         path: '/auth/sign-in',
-        builder: (context, state) => const SignInPage(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<AuthBloc>(),
+          child: const SignInPage(),
+        ),
       ),
       GoRoute(
         path: '/auth/sign-up',
-        builder: (context, state) => const SignUpPage(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<AuthBloc>(),
+          child: const SignUpPage(),
+        ),
       ),
       GoRoute(
         path: '/auth/verify-email',
-        builder: (context, state) => const EmailVerificationPage(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<AuthBloc>(),
+          child: const EmailVerificationPage(),
+        ),
       ),
       GoRoute(
         path: '/auth/forgot-password',
-        builder: (context, state) => const ForgotPasswordPage(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<AuthBloc>(),
+          child: const ForgotPasswordPage(),
+        ),
       ),
 
       // Main App Routes (Protected) - Wrapped in Shell
@@ -78,19 +96,31 @@ class AppRouter {
           ),
           GoRoute(
             path: '/meetings',
-            builder: (context, state) => const MeetingsListPage(),
+            builder: (context, state) => BlocProvider(
+              create: (_) => getIt<MeetingsBloc>(),
+              child: const MeetingsListPage(),
+            ),
           ),
           GoRoute(
             path: '/subscriptions',
-            builder: (context, state) => const SubscriptionPlansPage(),
+            builder: (context, state) => BlocProvider(
+              create: (_) => getIt<SubscriptionsBloc>(),
+              child: const SubscriptionPlansPage(),
+            ),
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const SettingsPage(),
+            builder: (context, state) => BlocProvider(
+              create: (_) => getIt<SettingsBloc>(),
+              child: const SettingsPage(),
+            ),
           ),
           GoRoute(
             path: '/profile',
-            builder: (context, state) => const ProfilePage(),
+            builder: (context, state) => BlocProvider(
+              create: (_) => getIt<ProfileBloc>(),
+              child: const ProfilePage(),
+            ),
           ),
         ],
       ),
@@ -120,7 +150,10 @@ class AppRouter {
 
       GoRoute(
         path: '/support',
-        builder: (context, state) => const SupportPage(),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<SupportBloc>(),
+          child: const SupportPage(),
+        ),
       ),
 
       // TODO: Add other full-screen routes

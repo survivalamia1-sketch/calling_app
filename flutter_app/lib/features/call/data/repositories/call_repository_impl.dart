@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/call.dart';
 import '../../domain/repositories/call_repository.dart';
@@ -34,7 +37,7 @@ class CallRepositoryImpl implements CallRepository {
       // Get auth token for signaling
       final token = await storage.read(key: 'auth_token');
       if (token == null) {
-        return Left(UnauthorizedFailure(message: 'Not authenticated'));
+        return const Left(UnauthorizedFailure(message: 'Not authenticated'));
       }
 
       await signalingService.connect(token);
@@ -87,7 +90,7 @@ class CallRepositoryImpl implements CallRepository {
         type: CallType.video,
         isAudioEnabled: true,
         isVideoEnabled: true,
-        participants: [],
+        participants: const [],
         startTime: DateTime.now(),
       );
 
@@ -159,7 +162,7 @@ class CallRepositoryImpl implements CallRepository {
             break;
         }
       } catch (e) {
-        print('Error handling signaling message: $e');
+        log('Error handling signaling message: $e');
       }
     });
   }
@@ -190,9 +193,8 @@ class CallRepositoryImpl implements CallRepository {
   void _removeParticipantByStreamId(String streamId) {
     if (_currentCall == null) return;
 
-    final updatedParticipants = _currentCall!.participants
-        .where((p) => p.userId != streamId)
-        .toList();
+    final updatedParticipants =
+        _currentCall!.participants.where((p) => p.userId != streamId).toList();
 
     _currentCall = _currentCall!.copyWith(participants: updatedParticipants);
     _callController.add(_currentCall!);
