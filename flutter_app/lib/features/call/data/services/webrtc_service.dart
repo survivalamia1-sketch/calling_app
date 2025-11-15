@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -203,7 +204,8 @@ class WebRTCService {
         'video': true,
       };
 
-      _screenStream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+      _screenStream =
+          await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
 
       if (_screenStream != null) {
         // Remove existing video tracks from peer connection
@@ -236,7 +238,7 @@ class WebRTCService {
 
       return _screenStream;
     } catch (e) {
-      print('Error starting screen share: $e');
+      log('Error starting screen share: $e');
       return null;
     }
   }
@@ -279,7 +281,7 @@ class WebRTCService {
 
       _isScreenSharing = false;
     } catch (e) {
-      print('Error stopping screen share: $e');
+      log('Error stopping screen share: $e');
     }
   }
 
