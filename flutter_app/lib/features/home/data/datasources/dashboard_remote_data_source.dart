@@ -28,8 +28,26 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       if (e.response?.statusCode == 401) {
         throw const UnauthorizedException(message: 'Unauthorized');
       }
-      throw ServerException(
-          message: e.response?.data?['error'] ?? 'Server error occurred');
+      // If endpoint doesn't exist (404), return empty stats
+      if (e.response?.statusCode == 404) {
+        return const DashboardStatsModel(
+          totalMeetings: 0,
+          upcomingMeetings: 0,
+          totalHours: 0.0,
+          totalParticipants: 0,
+          meetingsThisMonth: 0,
+          meetingsThisWeek: 0,
+          meetingsToday: 0,
+        );
+      }
+      // Handle case where response.data might be a string
+      String errorMessage = 'Server error occurred';
+      try {
+        if (e.response?.data is Map) {
+          errorMessage = e.response?.data?['error'] ?? errorMessage;
+        }
+      } catch (_) {}
+      throw ServerException(message: errorMessage);
     } catch (e) {
       throw const ServerException(message: 'Unexpected error occurred');
     }
@@ -54,9 +72,18 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       if (e.response?.statusCode == 401) {
         throw const UnauthorizedException(message: 'Unauthorized');
       }
-      throw ServerException(
-        message: e.response?.data?['error'] ?? 'Server error occurred',
-      );
+      // If endpoint doesn't exist (404), return empty list
+      if (e.response?.statusCode == 404) {
+        return [];
+      }
+      // Handle case where response.data might be a string
+      String errorMessage = 'Server error occurred';
+      try {
+        if (e.response?.data is Map) {
+          errorMessage = e.response?.data?['error'] ?? errorMessage;
+        }
+      } catch (_) {}
+      throw ServerException(message: errorMessage);
     } catch (e) {
       throw const ServerException(message: 'Unexpected error occurred');
     }

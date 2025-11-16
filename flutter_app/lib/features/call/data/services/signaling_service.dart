@@ -52,6 +52,7 @@ class SignalingService {
       StreamController<SignalingState>.broadcast();
 
   SignalingState _currentState = SignalingState.disconnected;
+  bool _isDisposed = false;
 
   Stream<SignalingMessage> get messages => _messageController.stream;
   Stream<SignalingState> get state => _stateController.stream;
@@ -196,15 +197,21 @@ class SignalingService {
 
   /// Update signaling state
   void _updateState(SignalingState newState) {
+    if (_isDisposed) return; // Don't update if already disposed
+
     _currentState = newState;
-    _stateController.add(newState);
+    if (!_stateController.isClosed) {
+      _stateController.add(newState);
+    }
   }
 
   /// Disconnect and cleanup
   Future<void> dispose() async {
+    if (_isDisposed) return;
+    _isDisposed = true;
+
     await _channel?.sink.close();
     _channel = null;
-    _updateState(SignalingState.disconnected);
     await _messageController.close();
     await _stateController.close();
   }

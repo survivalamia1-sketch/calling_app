@@ -4,26 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../core/usecases/usecase.dart';
 import '../../data/services/webrtc_service.dart';
 import '../../domain/entities/call.dart';
 import '../../domain/repositories/call_repository.dart';
-import '../../domain/usecases/join_call.dart';
-import '../../domain/usecases/leave_call.dart';
-import '../../domain/usecases/switch_camera.dart';
-import '../../domain/usecases/toggle_audio.dart';
-import '../../domain/usecases/toggle_video.dart';
 
 part 'call_bloc.freezed.dart';
 part 'call_event.dart';
 part 'call_state.dart';
 
 class CallBloc extends Bloc<CallEvent, CallState> {
-  final JoinCall joinCall;
-  final LeaveCall leaveCall;
-  final ToggleAudio toggleAudio;
-  final ToggleVideo toggleVideo;
-  final SwitchCamera switchCamera;
   final CallRepository repository;
   final WebRTCService webrtcService;
 
@@ -35,20 +24,15 @@ class CallBloc extends Bloc<CallEvent, CallState> {
   final Map<String, RTCVideoRenderer> _remoteRenderers = {};
 
   CallBloc({
-    required this.joinCall,
-    required this.leaveCall,
-    required this.toggleAudio,
-    required this.toggleVideo,
-    required this.switchCamera,
     required this.repository,
     required this.webrtcService,
   }) : super(const CallState.initial()) {
-    on<_JoinCall>(_onJoinCall);
-    on<_LeaveCall>(_onLeaveCall);
-    on<_ToggleAudio>(_onToggleAudio);
-    on<_ToggleVideo>(_onToggleVideo);
-    on<_SwitchCamera>(_onSwitchCamera);
-    on<_UpdateCall>(_onUpdateCall);
+    on<JoinCall>(_onJoinCall);
+    on<LeaveCall>(_onLeaveCall);
+    on<ToggleAudio>(_onToggleAudio);
+    on<ToggleVideo>(_onToggleVideo);
+    on<SwitchCamera>(_onSwitchCamera);
+    on<UpdateCall>(_onUpdateCall);
 
     _initializeRenderers();
   }
@@ -58,12 +42,12 @@ class CallBloc extends Bloc<CallEvent, CallState> {
   }
 
   Future<void> _onJoinCall(
-    _JoinCall event,
+    JoinCall event,
     Emitter<CallState> emit,
   ) async {
     emit(const CallState.connecting());
 
-    final result = await joinCall(JoinCallParams(roomId: event.roomId));
+    final result = await repository.joinCall(event.roomId);
 
     result.fold(
       (failure) => emit(CallState.error(
@@ -104,7 +88,7 @@ class CallBloc extends Bloc<CallEvent, CallState> {
           }
 
           // Emit updated state with renderers
-          if (state is _Connected) {
+          if (state is Connected) {
             emit(CallState.connected(
               call: call,
               localRenderer: _localRenderer,
@@ -128,10 +112,10 @@ class CallBloc extends Bloc<CallEvent, CallState> {
   }
 
   Future<void> _onLeaveCall(
-    _LeaveCall event,
+    LeaveCall event,
     Emitter<CallState> emit,
   ) async {
-    final result = await leaveCall(NoParams());
+    final result = await repository.leaveCall();
 
     result.fold(
       (failure) => emit(CallState.error(
@@ -145,16 +129,16 @@ class CallBloc extends Bloc<CallEvent, CallState> {
   }
 
   Future<void> _onToggleAudio(
-    _ToggleAudio event,
+    ToggleAudio event,
     Emitter<CallState> emit,
   ) async {
-    if (state is! _Connected) return;
+    if (state is! Connected) return;
 
-    final currentState = state as _Connected;
+    final currentState = state as Connected;
     final currentAudioState = currentState.call.isAudioEnabled;
 
-    final result = await toggleAudio(
-      ToggleAudioParams(enable: !currentAudioState),
+    final result = await repository.toggleAudio(
+      !currentAudioState,
     );
 
     result.fold(
@@ -168,16 +152,16 @@ class CallBloc extends Bloc<CallEvent, CallState> {
   }
 
   Future<void> _onToggleVideo(
-    _ToggleVideo event,
+    ToggleVideo event,
     Emitter<CallState> emit,
   ) async {
-    if (state is! _Connected) return;
+    if (state is! Connected) return;
 
-    final currentState = state as _Connected;
+    final currentState = state as Connected;
     final currentVideoState = currentState.call.isVideoEnabled;
 
-    final result = await toggleVideo(
-      ToggleVideoParams(enable: !currentVideoState),
+    final result = await repository.toggleVideo(
+      !currentVideoState,
     );
 
     result.fold(
@@ -191,10 +175,10 @@ class CallBloc extends Bloc<CallEvent, CallState> {
   }
 
   Future<void> _onSwitchCamera(
-    _SwitchCamera event,
+    SwitchCamera event,
     Emitter<CallState> emit,
   ) async {
-    final result = await switchCamera(NoParams());
+    final result = await repository.switchCamera();
 
     result.fold(
       (failure) => emit(CallState.error(
@@ -207,11 +191,11 @@ class CallBloc extends Bloc<CallEvent, CallState> {
   }
 
   void _onUpdateCall(
-    _UpdateCall event,
+    UpdateCall event,
     Emitter<CallState> emit,
   ) {
-    if (state is _Connected) {
-      final currentState = state as _Connected;
+    if (state is Connected) {
+      final currentState = state as Connected;
       emit(CallState.connected(
         call: event.call,
         localRenderer: currentState.localRenderer,
@@ -225,7 +209,6 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     _localStreamSubscription?.cancel();
     _remoteStreamsSubscription?.cancel();
 
-    _localRenderer.srcObject = null;
     _localRenderer.dispose();
 
     for (var renderer in _remoteRenderers.values) {

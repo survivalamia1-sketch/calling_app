@@ -2,9 +2,12 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/error/exceptions.dart';
+import '../../domain/entities/scheduled_meeting.dart';
 import '../models/meeting_model.dart';
+import '../models/scheduled_meeting_model.dart';
 
 abstract class MeetingsRemoteDataSource {
+  // Regular Meetings
   Future<List<MeetingModel>> getMeetings({
     String? status,
     int? limit,
@@ -39,6 +42,54 @@ abstract class MeetingsRemoteDataSource {
   Future<String> joinMeeting(String roomCode);
 
   Future<void> leaveMeeting(String roomId);
+
+  // Scheduled Meetings
+  Future<List<ScheduledMeetingModel>> getScheduledMeetings({
+    ScheduledMeetingStatus? status,
+    int? limit,
+    int? offset,
+  });
+
+  Future<ScheduledMeetingModel> getScheduledMeetingById(String id);
+
+  Future<ScheduledMeetingModel> createScheduledMeeting({
+    required String title,
+    required String description,
+    required DateTime scheduledAt,
+    required int durationMinutes,
+    int? maxParticipants,
+    String? password,
+    bool requiresApproval,
+    bool waitingRoomEnabled,
+    bool allowJoinBeforeHost,
+    bool muteOnEntry,
+    List<String> invitedEmails,
+    bool isRecurring,
+    RecurrencePattern? recurrencePattern,
+  });
+
+  Future<ScheduledMeetingModel> updateScheduledMeeting({
+    required String id,
+    String? title,
+    String? description,
+    DateTime? scheduledAt,
+    int? durationMinutes,
+    int? maxParticipants,
+    String? password,
+    bool? requiresApproval,
+    bool? waitingRoomEnabled,
+    bool? allowJoinBeforeHost,
+    bool? muteOnEntry,
+    List<String>? invitedEmails,
+  });
+
+  Future<void> deleteScheduledMeeting(String id);
+
+  Future<String> startScheduledMeeting(String id);
+
+  Future<List<ScheduledMeetingModel>> getUpcomingScheduledMeetings({
+    int? limit,
+  });
 }
 
 class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
@@ -253,6 +304,235 @@ class MeetingsRemoteDataSourceImpl implements MeetingsRemoteDataSource {
       }
     } on DioException catch (e) {
       throw ServerException(message: e.message ?? 'Network error');
+    }
+  }
+
+  // Scheduled Meetings Implementation
+  // NOTE: These are interface methods ready for backend API implementation
+  // Currently returns empty/error as backend endpoints are not yet available
+
+  @override
+  Future<List<ScheduledMeetingModel>> getScheduledMeetings({
+    ScheduledMeetingStatus? status,
+    int? limit,
+    int? offset,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (status != null) queryParams['status'] = status.name;
+      if (limit != null) queryParams['limit'] = limit;
+      if (offset != null) queryParams['offset'] = offset;
+
+      final response = await client.get(
+        '/scheduled-meetings', // Backend endpoint to be implemented
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['meetings'] ?? [];
+        return data.map((json) => ScheduledMeetingModel.fromJson(json)).toList();
+      } else {
+        throw const ServerException(message: 'Failed to get scheduled meetings');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException(message: 'Unauthorized');
+      }
+      // Return empty list if endpoint not implemented
+      return [];
+    }
+  }
+
+  @override
+  Future<ScheduledMeetingModel> getScheduledMeetingById(String id) async {
+    try {
+      final response = await client.get('/scheduled-meetings/$id');
+
+      if (response.statusCode == 200) {
+        return ScheduledMeetingModel.fromJson(response.data['meeting'] ?? response.data);
+      } else {
+        throw const ServerException(message: 'Failed to get scheduled meeting');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException(message: 'Unauthorized');
+      }
+      if (e.response?.statusCode == 404) {
+        throw const ServerException(message: 'Scheduled meeting not found');
+      }
+      throw ServerException(message: e.message ?? 'Network error');
+    }
+  }
+
+  @override
+  Future<ScheduledMeetingModel> createScheduledMeeting({
+    required String title,
+    required String description,
+    required DateTime scheduledAt,
+    required int durationMinutes,
+    int? maxParticipants,
+    String? password,
+    bool requiresApproval = false,
+    bool waitingRoomEnabled = false,
+    bool allowJoinBeforeHost = true,
+    bool muteOnEntry = false,
+    List<String> invitedEmails = const [],
+    bool isRecurring = false,
+    RecurrencePattern? recurrencePattern,
+  }) async {
+    try {
+      final requestData = <String, dynamic>{
+        'title': title,
+        'description': description,
+        'scheduled_at': scheduledAt.toUtc().toIso8601String(),
+        'duration_minutes': durationMinutes,
+        'requires_approval': requiresApproval,
+        'waiting_room_enabled': waitingRoomEnabled,
+        'allow_join_before_host': allowJoinBeforeHost,
+        'mute_on_entry': muteOnEntry,
+        'invited_emails': invitedEmails,
+        'is_recurring': isRecurring,
+      };
+
+      if (maxParticipants != null) requestData['max_participants'] = maxParticipants;
+      if (password != null) requestData['password'] = password;
+      if (recurrencePattern != null) {
+        requestData['recurrence_pattern'] = RecurrencePatternModel.fromDomain(recurrencePattern).toJson();
+      }
+
+      final response = await client.post(
+        '/scheduled-meetings',
+        data: requestData,
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return ScheduledMeetingModel.fromJson(response.data['meeting'] ?? response.data);
+      } else {
+        throw const ServerException(message: 'Failed to create scheduled meeting');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException(message: 'Unauthorized');
+      }
+      throw ServerException(message: e.response?.data['error'] ?? e.message ?? 'Network error');
+    }
+  }
+
+  @override
+  Future<ScheduledMeetingModel> updateScheduledMeeting({
+    required String id,
+    String? title,
+    String? description,
+    DateTime? scheduledAt,
+    int? durationMinutes,
+    int? maxParticipants,
+    String? password,
+    bool? requiresApproval,
+    bool? waitingRoomEnabled,
+    bool? allowJoinBeforeHost,
+    bool? muteOnEntry,
+    List<String>? invitedEmails,
+  }) async {
+    try {
+      final requestData = <String, dynamic>{};
+      if (title != null) requestData['title'] = title;
+      if (description != null) requestData['description'] = description;
+      if (scheduledAt != null) requestData['scheduled_at'] = scheduledAt.toUtc().toIso8601String();
+      if (durationMinutes != null) requestData['duration_minutes'] = durationMinutes;
+      if (maxParticipants != null) requestData['max_participants'] = maxParticipants;
+      if (password != null) requestData['password'] = password;
+      if (requiresApproval != null) requestData['requires_approval'] = requiresApproval;
+      if (waitingRoomEnabled != null) requestData['waiting_room_enabled'] = waitingRoomEnabled;
+      if (allowJoinBeforeHost != null) requestData['allow_join_before_host'] = allowJoinBeforeHost;
+      if (muteOnEntry != null) requestData['mute_on_entry'] = muteOnEntry;
+      if (invitedEmails != null) requestData['invited_emails'] = invitedEmails;
+
+      final response = await client.put(
+        '/scheduled-meetings/$id',
+        data: requestData,
+      );
+
+      if (response.statusCode == 200) {
+        return ScheduledMeetingModel.fromJson(response.data['meeting'] ?? response.data);
+      } else {
+        throw const ServerException(message: 'Failed to update scheduled meeting');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException(message: 'Unauthorized');
+      }
+      if (e.response?.statusCode == 404) {
+        throw const ServerException(message: 'Scheduled meeting not found');
+      }
+      throw ServerException(message: e.response?.data['error'] ?? e.message ?? 'Network error');
+    }
+  }
+
+  @override
+  Future<void> deleteScheduledMeeting(String id) async {
+    try {
+      final response = await client.delete('/scheduled-meetings/$id');
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw const ServerException(message: 'Failed to delete scheduled meeting');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException(message: 'Unauthorized');
+      }
+      if (e.response?.statusCode == 404) {
+        throw const ServerException(message: 'Scheduled meeting not found');
+      }
+      throw ServerException(message: e.message ?? 'Network error');
+    }
+  }
+
+  @override
+  Future<String> startScheduledMeeting(String id) async {
+    try {
+      final response = await client.post('/scheduled-meetings/$id/start');
+
+      if (response.statusCode == 200) {
+        return response.data['room_id'] as String;
+      } else {
+        throw const ServerException(message: 'Failed to start scheduled meeting');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException(message: 'Unauthorized');
+      }
+      if (e.response?.statusCode == 404) {
+        throw const ServerException(message: 'Scheduled meeting not found');
+      }
+      throw ServerException(message: e.response?.data['error'] ?? e.message ?? 'Network error');
+    }
+  }
+
+  @override
+  Future<List<ScheduledMeetingModel>> getUpcomingScheduledMeetings({
+    int? limit,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (limit != null) queryParams['limit'] = limit;
+
+      final response = await client.get(
+        '/scheduled-meetings/upcoming',
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data['meetings'] ?? [];
+        return data.map((json) => ScheduledMeetingModel.fromJson(json)).toList();
+      } else {
+        throw const ServerException(message: 'Failed to get upcoming scheduled meetings');
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const UnauthorizedException(message: 'Unauthorized');
+      }
+      // Return empty list if endpoint not implemented
+      return [];
     }
   }
 }

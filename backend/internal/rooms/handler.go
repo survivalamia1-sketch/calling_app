@@ -88,6 +88,35 @@ func (h *Handler) GetRoom(c *gin.Context) {
 	c.JSON(http.StatusOK, room)
 }
 
+// GetRoomByCode godoc
+// @Summary Get room by code
+// @Description Get room details by its unique code
+// @Tags rooms
+// @Produce json
+// @Param code path string true "Room Code (e.g., 123-456-789)"
+// @Success 200 {object} models.Room
+// @Failure 404 {object} map[string]interface{}
+// @Router /rooms/by-code/{code} [get]
+func (h *Handler) GetRoomByCode(c *gin.Context) {
+	code := c.Param("code")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Room code is required",
+		})
+		return
+	}
+
+	room, err := h.service.GetRoomByCode(code)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, room)
+}
+
 // GetUserRooms godoc
 // @Summary Get user rooms
 // @Description Get all rooms created by the user

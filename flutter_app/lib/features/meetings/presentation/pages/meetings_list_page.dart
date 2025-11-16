@@ -7,6 +7,7 @@ import '../bloc/meetings_bloc.dart';
 import '../bloc/meetings_event.dart';
 import '../bloc/meetings_state.dart';
 import '../widgets/meeting_card.dart';
+import 'meeting_details_page.dart';
 
 class MeetingsListPage extends StatelessWidget {
   const MeetingsListPage({super.key});
@@ -105,7 +106,13 @@ class MeetingsListPage extends StatelessWidget {
                       return MeetingCard(
                         meeting: meeting,
                         onTap: () {
-                          // TODO: Navigate to meeting details
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => MeetingDetailsPage(
+                                meeting: meeting,
+                              ),
+                            ),
+                          );
                         },
                       );
                     },

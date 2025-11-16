@@ -6,9 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/yourusername/calling-app-backend/internal/admin"
 	"github.com/yourusername/calling-app-backend/internal/auth"
+	"github.com/yourusername/calling-app-backend/internal/chat"
+	"github.com/yourusername/calling-app-backend/internal/dashboard"
 	dbmigrate "github.com/yourusername/calling-app-backend/internal/database"
 	"github.com/yourusername/calling-app-backend/internal/middleware"
+	"github.com/yourusername/calling-app-backend/internal/notifications"
 	"github.com/yourusername/calling-app-backend/internal/rooms"
+	"github.com/yourusername/calling-app-backend/internal/scheduled_meetings"
 	"github.com/yourusername/calling-app-backend/internal/subscriptions"
 	"github.com/yourusername/calling-app-backend/internal/webrtc"
 	"github.com/yourusername/calling-app-backend/pkg/config"
@@ -81,6 +85,10 @@ func main() {
 	subsHandler := subscriptions.NewHandler(cfg)
 	roomsHandler := rooms.NewHandler()
 	adminHandler := admin.NewHandler(cfg)
+	dashboardHandler := dashboard.NewHandler()
+	scheduledMeetingsHandler := scheduled_meetings.NewHandler()
+	chatHandler := chat.NewHandler()
+	notificationsHandler := notifications.NewHandler()
 
 	// API routes
 	v1 := router.Group("/api/" + cfg.Server.APIVersion)
@@ -102,6 +110,7 @@ func main() {
 				authProtected.GET("/profile", authHandler.GetProfile)
 				authProtected.PUT("/profile", authHandler.UpdateProfile)
 				authProtected.POST("/change-password", authHandler.ChangePassword)
+				authProtected.POST("/avatar", authHandler.UploadAvatar)
 			}
 		}
 
@@ -127,9 +136,11 @@ func main() {
 		{
 			// Public/semi-public routes
 			// More specific routes must come first in Gin
+			roomRoutes.GET("/by-code/:code", roomsHandler.GetRoomByCode)
 			roomRoutes.GET("/:id/participants", roomsHandler.GetRoomParticipants)
 			roomRoutes.GET("/:id/status", roomsHandler.GetRoomStatus)
 			roomRoutes.GET("/:id/info", webrtc.GetRoomInfoHandler(webrtcHub))
+			roomRoutes.GET("/:id/messages", chatHandler.GetRoomMessages)
 			roomRoutes.GET("/:id", roomsHandler.GetRoom)
 
 			// Join room (can be authenticated or guest)
@@ -144,11 +155,43 @@ func main() {
 				roomProtected.POST("/:id/leave", roomsHandler.LeaveRoom)
 				roomProtected.POST("/:id/end", roomsHandler.EndRoom)
 				roomProtected.DELETE("/:id", roomsHandler.DeleteRoom)
+				roomProtected.DELETE("/:room_id/messages/:message_id", chatHandler.DeleteMessage)
 			}
 		}
 
 		// WebRTC signaling WebSocket
 		v1.GET("/ws", webrtc.HandleWebSocket(webrtcHub))
+
+		// Dashboard routes
+		dashboardRoutes := v1.Group("/dashboard")
+		dashboardRoutes.Use(middleware.AuthMiddleware(cfg))
+		{
+			dashboardRoutes.GET("/stats", dashboardHandler.GetDashboardStats)
+			dashboardRoutes.GET("/upcoming-meetings", dashboardHandler.GetUpcomingMeetings)
+		}
+
+		// Scheduled meetings routes
+		scheduledMeetingsRoutes := v1.Group("/scheduled-meetings")
+		scheduledMeetingsRoutes.Use(middleware.AuthMiddleware(cfg))
+		{
+			scheduledMeetingsRoutes.GET("/upcoming", scheduledMeetingsHandler.GetUpcomingMeetings)
+			scheduledMeetingsRoutes.GET("", scheduledMeetingsHandler.GetScheduledMeetings)
+			scheduledMeetingsRoutes.POST("", scheduledMeetingsHandler.CreateScheduledMeeting)
+			scheduledMeetingsRoutes.GET("/:id", scheduledMeetingsHandler.GetScheduledMeeting)
+			scheduledMeetingsRoutes.PUT("/:id", scheduledMeetingsHandler.UpdateScheduledMeeting)
+			scheduledMeetingsRoutes.DELETE("/:id", scheduledMeetingsHandler.DeleteScheduledMeeting)
+			scheduledMeetingsRoutes.POST("/:id/start", scheduledMeetingsHandler.StartScheduledMeeting)
+		}
+
+		// Notifications routes
+		notificationsRoutes := v1.Group("/notifications")
+		notificationsRoutes.Use(middleware.AuthMiddleware(cfg))
+		{
+			notificationsRoutes.GET("", notificationsHandler.GetNotifications)
+			notificationsRoutes.GET("/unread-count", notificationsHandler.GetUnreadCount)
+			notificationsRoutes.POST("/:id/read", notificationsHandler.MarkAsRead)
+			notificationsRoutes.POST("/read-all", notificationsHandler.MarkAllAsRead)
+		}
 
 		// ===== ADMIN ROUTES =====
 		adminRoutes := v1.Group("/admin")

@@ -142,13 +142,37 @@ func (h *Hub) unregisterClient(client *Client) {
 
 func (h *Hub) HandleMessage(client *Client, msg Message) {
 	switch msg.Type {
-	case "offer", "answer", "ice-candidate":
-		// Forward WebRTC signaling messages
+	case "offer", "answer", "ice-candidate", "ice_candidate":
+		// Forward WebRTC signaling messages (support both ice-candidate and ice_candidate)
 		h.sendToClient(client.RoomID, msg.To, msg)
 
-	case "chat":
-		// Broadcast chat message to all in room
+	case "start_screen_share", "stop_screen_share":
+		// Broadcast screen sharing state to all participants
+		msg.From = client.ID
 		h.broadcastToRoom(client.RoomID, msg, client.ID)
+
+	case "participant_muted", "participant_unmuted", "video_toggled":
+		// Broadcast participant media state changes
+		msg.From = client.ID
+		h.broadcastToRoom(client.RoomID, msg, client.ID)
+
+	case "meeting_ended":
+		// Host ended meeting - broadcast to all
+		msg.From = client.ID
+		h.broadcastToRoom(client.RoomID, msg, client.ID)
+
+	case "chat", "message", "private_message":
+		// Broadcast chat message to all in room (or specific recipient for private)
+		msg.From = client.ID
+		if msg.Type == "private_message" && msg.To != "" {
+			// Send private message only to recipient and sender
+			h.sendToClient(client.RoomID, msg.To, msg)
+			// Echo back to sender for confirmation
+			h.sendToClient(client.RoomID, client.ID, msg)
+		} else {
+			// Public message - broadcast to all
+			h.broadcastToRoom(client.RoomID, msg, client.ID)
+		}
 
 	default:
 		log.Printf("Unknown message type: %s from client %s", msg.Type, client.ID)

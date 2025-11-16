@@ -24,7 +24,8 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       );
 
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user']);
+        // Backend returns user directly, not wrapped
+        return UserModel.fromJson(response.data['user'] ?? response.data);
       } else {
         throw const ServerException(message: 'Failed to update profile');
       }
@@ -74,7 +75,8 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       final response = await client.get('/auth/profile');
 
       if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user']);
+        // Backend returns user directly, not wrapped
+        return UserModel.fromJson(response.data['user'] ?? response.data);
       } else {
         throw const ServerException(message: 'Failed to get profile');
       }

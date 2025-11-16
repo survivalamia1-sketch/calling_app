@@ -10,6 +10,8 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../domain/entities/bug_report.dart';
 import '../../domain/entities/faq.dart';
 import '../bloc/support_bloc.dart';
+import 'tutorials_page.dart';
+import 'user_guide_page.dart';
 
 class SupportPage extends StatefulWidget {
   const SupportPage({super.key});
@@ -202,10 +204,10 @@ class _SupportPageState extends State<SupportPage> {
                         title: const Text('User Guide'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
-                          // TODO: Open user guide
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('User guide coming soon!')),
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const UserGuidePage(),
+                            ),
                           );
                         },
                       ),
@@ -215,10 +217,10 @@ class _SupportPageState extends State<SupportPage> {
                         title: const Text('Video Tutorials'),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                         onTap: () {
-                          // TODO: Open tutorials
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Video tutorials coming soon!')),
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const TutorialsPage(),
+                            ),
                           );
                         },
                       ),

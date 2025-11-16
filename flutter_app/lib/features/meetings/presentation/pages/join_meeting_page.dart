@@ -26,8 +26,8 @@ class _JoinMeetingPageState extends State<JoinMeetingPage> {
 
     final roomCode = _roomCodeController.text.trim().toUpperCase();
 
-    // Navigate to call page with the room code
-    context.go('/call/$roomCode');
+    // Navigate to preview page first (proper flow: Join → Preview → Connecting → Call)
+    context.go('/call/preview/$roomCode');
   }
 
   void _pasteFromClipboard() async {

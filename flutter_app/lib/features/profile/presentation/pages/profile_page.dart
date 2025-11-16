@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../domain/entities/profile_update.dart';
 import '../bloc/profile_bloc.dart';
@@ -14,58 +13,54 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<ProfileBloc>(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                _showEditProfileDialog(context);
-              },
-            ),
-          ],
-        ),
-        body: BlocListener<ProfileBloc, ProfileState>(
-          listener: (context, state) {
-            state.whenOrNull(
-              profileUpdated: (user) {
-                // Update AuthBloc with new user data
-                context.read<AuthBloc>().add(
-                      const AuthEvent.getCurrentUserRequested(),
-                    );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Profile updated successfully')),
-                );
-              },
-              passwordChanged: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Password changed successfully')),
-                );
-              },
-              error: (message) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              },
-            );
-          },
-          child: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, authState) {
-              return authState.maybeWhen(
-                authenticated: (user) => _buildProfileContent(context, user),
-                orElse: () => const Center(
-                  child: CircularProgressIndicator(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              _showEditProfileDialog(context);
+            },
+          ),
+        ],
+      ),
+      body: BlocListener<ProfileBloc, ProfileState>(
+        listener: (context, state) {
+          state.whenOrNull(
+            profileUpdated: (user) {
+              // Update AuthBloc with new user data
+              context.read<AuthBloc>().add(
+                    const AuthEvent.getCurrentUserRequested(),
+                  );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Profile updated successfully')),
+              );
+            },
+            passwordChanged: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Password changed successfully')),
+              );
+            },
+            error: (message) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(message),
+                  backgroundColor: Colors.red,
                 ),
               );
             },
-          ),
+          );
+        },
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, authState) {
+            return authState.maybeWhen(
+              authenticated: (user) => _buildProfileContent(context, user),
+              orElse: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -82,16 +77,25 @@ class ProfilePage extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 60,
+                  backgroundImage:
+                      user.avatar != null && user.avatar!.isNotEmpty
+                          ? NetworkImage(user.avatar!)
+                          : null,
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Text(
-                    user.fullName.isNotEmpty
-                        ? user.fullName[0].toUpperCase()
-                        : 'U',
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
+                  child: user.avatar == null || user.avatar!.isEmpty
+                      ? Text(
+                          user.fullName.isNotEmpty
+                              ? user.fullName[0].toUpperCase()
+                              : 'U',
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayMedium
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        )
+                      : null,
                 ),
                 Positioned(
                   bottom: 0,
@@ -133,7 +137,7 @@ class ProfilePage extends StatelessWidget {
                   leading: const Icon(Icons.email),
                   title: const Text('Email'),
                   subtitle: Text(user.email),
-                  trailing: user.emailVerified
+                  trailing: user.isVerified
                       ? const Icon(Icons.verified, color: Colors.green)
                       : const Icon(Icons.info_outline, color: Colors.orange),
                 ),

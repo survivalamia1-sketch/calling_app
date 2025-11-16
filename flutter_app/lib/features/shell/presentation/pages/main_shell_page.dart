@@ -157,31 +157,12 @@ class _MainShellPageState extends State<MainShellPage> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () => context.push('/meetings/new'),
-                          icon: const Icon(Icons.add),
-                          label: const Text('New Meeting'),
-                        ),
+                      ElevatedButton.icon(
+                        onPressed: () => context.push('/meetings/new'),
+                        icon: const Icon(Icons.add),
+                        label: const Text('New Meeting'),
                       ),
                     ],
-                  ),
-                ),
-                trailing: Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ListTile(
-                        leading: const CircleAvatar(
-                          child: Icon(Icons.person),
-                        ),
-                        title: const Text('User Name'),
-                        subtitle: const Text('user@example.com'),
-                        onTap: () => context.push('/profile'),
-                      ),
-                    ),
                   ),
                 ),
               ),

@@ -49,32 +49,32 @@ mixin _$CallEvent {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_JoinCall value) joinCall,
-    required TResult Function(_LeaveCall value) leaveCall,
-    required TResult Function(_ToggleAudio value) toggleAudio,
-    required TResult Function(_ToggleVideo value) toggleVideo,
-    required TResult Function(_SwitchCamera value) switchCamera,
-    required TResult Function(_UpdateCall value) updateCall,
+    required TResult Function(JoinCall value) joinCall,
+    required TResult Function(LeaveCall value) leaveCall,
+    required TResult Function(ToggleAudio value) toggleAudio,
+    required TResult Function(ToggleVideo value) toggleVideo,
+    required TResult Function(SwitchCamera value) switchCamera,
+    required TResult Function(UpdateCall value) updateCall,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_JoinCall value)? joinCall,
-    TResult? Function(_LeaveCall value)? leaveCall,
-    TResult? Function(_ToggleAudio value)? toggleAudio,
-    TResult? Function(_ToggleVideo value)? toggleVideo,
-    TResult? Function(_SwitchCamera value)? switchCamera,
-    TResult? Function(_UpdateCall value)? updateCall,
+    TResult? Function(JoinCall value)? joinCall,
+    TResult? Function(LeaveCall value)? leaveCall,
+    TResult? Function(ToggleAudio value)? toggleAudio,
+    TResult? Function(ToggleVideo value)? toggleVideo,
+    TResult? Function(SwitchCamera value)? switchCamera,
+    TResult? Function(UpdateCall value)? updateCall,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_JoinCall value)? joinCall,
-    TResult Function(_LeaveCall value)? leaveCall,
-    TResult Function(_ToggleAudio value)? toggleAudio,
-    TResult Function(_ToggleVideo value)? toggleVideo,
-    TResult Function(_SwitchCamera value)? switchCamera,
-    TResult Function(_UpdateCall value)? updateCall,
+    TResult Function(JoinCall value)? joinCall,
+    TResult Function(LeaveCall value)? leaveCall,
+    TResult Function(ToggleAudio value)? toggleAudio,
+    TResult Function(ToggleVideo value)? toggleVideo,
+    TResult Function(SwitchCamera value)? switchCamera,
+    TResult Function(UpdateCall value)? updateCall,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -130,7 +130,7 @@ class __$$JoinCallImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$JoinCallImpl implements _JoinCall {
+class _$JoinCallImpl implements JoinCall {
   const _$JoinCallImpl({required this.roomId});
 
   @override
@@ -204,12 +204,12 @@ class _$JoinCallImpl implements _JoinCall {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_JoinCall value) joinCall,
-    required TResult Function(_LeaveCall value) leaveCall,
-    required TResult Function(_ToggleAudio value) toggleAudio,
-    required TResult Function(_ToggleVideo value) toggleVideo,
-    required TResult Function(_SwitchCamera value) switchCamera,
-    required TResult Function(_UpdateCall value) updateCall,
+    required TResult Function(JoinCall value) joinCall,
+    required TResult Function(LeaveCall value) leaveCall,
+    required TResult Function(ToggleAudio value) toggleAudio,
+    required TResult Function(ToggleVideo value) toggleVideo,
+    required TResult Function(SwitchCamera value) switchCamera,
+    required TResult Function(UpdateCall value) updateCall,
   }) {
     return joinCall(this);
   }
@@ -217,12 +217,12 @@ class _$JoinCallImpl implements _JoinCall {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_JoinCall value)? joinCall,
-    TResult? Function(_LeaveCall value)? leaveCall,
-    TResult? Function(_ToggleAudio value)? toggleAudio,
-    TResult? Function(_ToggleVideo value)? toggleVideo,
-    TResult? Function(_SwitchCamera value)? switchCamera,
-    TResult? Function(_UpdateCall value)? updateCall,
+    TResult? Function(JoinCall value)? joinCall,
+    TResult? Function(LeaveCall value)? leaveCall,
+    TResult? Function(ToggleAudio value)? toggleAudio,
+    TResult? Function(ToggleVideo value)? toggleVideo,
+    TResult? Function(SwitchCamera value)? switchCamera,
+    TResult? Function(UpdateCall value)? updateCall,
   }) {
     return joinCall?.call(this);
   }
@@ -230,12 +230,12 @@ class _$JoinCallImpl implements _JoinCall {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_JoinCall value)? joinCall,
-    TResult Function(_LeaveCall value)? leaveCall,
-    TResult Function(_ToggleAudio value)? toggleAudio,
-    TResult Function(_ToggleVideo value)? toggleVideo,
-    TResult Function(_SwitchCamera value)? switchCamera,
-    TResult Function(_UpdateCall value)? updateCall,
+    TResult Function(JoinCall value)? joinCall,
+    TResult Function(LeaveCall value)? leaveCall,
+    TResult Function(ToggleAudio value)? toggleAudio,
+    TResult Function(ToggleVideo value)? toggleVideo,
+    TResult Function(SwitchCamera value)? switchCamera,
+    TResult Function(UpdateCall value)? updateCall,
     required TResult orElse(),
   }) {
     if (joinCall != null) {
@@ -245,8 +245,8 @@ class _$JoinCallImpl implements _JoinCall {
   }
 }
 
-abstract class _JoinCall implements CallEvent {
-  const factory _JoinCall({required final String roomId}) = _$JoinCallImpl;
+abstract class JoinCall implements CallEvent {
+  const factory JoinCall({required final String roomId}) = _$JoinCallImpl;
 
   String get roomId;
   @JsonKey(ignore: true)
@@ -272,7 +272,7 @@ class __$$LeaveCallImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$LeaveCallImpl implements _LeaveCall {
+class _$LeaveCallImpl implements LeaveCall {
   const _$LeaveCallImpl();
 
   @override
@@ -335,12 +335,12 @@ class _$LeaveCallImpl implements _LeaveCall {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_JoinCall value) joinCall,
-    required TResult Function(_LeaveCall value) leaveCall,
-    required TResult Function(_ToggleAudio value) toggleAudio,
-    required TResult Function(_ToggleVideo value) toggleVideo,
-    required TResult Function(_SwitchCamera value) switchCamera,
-    required TResult Function(_UpdateCall value) updateCall,
+    required TResult Function(JoinCall value) joinCall,
+    required TResult Function(LeaveCall value) leaveCall,
+    required TResult Function(ToggleAudio value) toggleAudio,
+    required TResult Function(ToggleVideo value) toggleVideo,
+    required TResult Function(SwitchCamera value) switchCamera,
+    required TResult Function(UpdateCall value) updateCall,
   }) {
     return leaveCall(this);
   }
@@ -348,12 +348,12 @@ class _$LeaveCallImpl implements _LeaveCall {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_JoinCall value)? joinCall,
-    TResult? Function(_LeaveCall value)? leaveCall,
-    TResult? Function(_ToggleAudio value)? toggleAudio,
-    TResult? Function(_ToggleVideo value)? toggleVideo,
-    TResult? Function(_SwitchCamera value)? switchCamera,
-    TResult? Function(_UpdateCall value)? updateCall,
+    TResult? Function(JoinCall value)? joinCall,
+    TResult? Function(LeaveCall value)? leaveCall,
+    TResult? Function(ToggleAudio value)? toggleAudio,
+    TResult? Function(ToggleVideo value)? toggleVideo,
+    TResult? Function(SwitchCamera value)? switchCamera,
+    TResult? Function(UpdateCall value)? updateCall,
   }) {
     return leaveCall?.call(this);
   }
@@ -361,12 +361,12 @@ class _$LeaveCallImpl implements _LeaveCall {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_JoinCall value)? joinCall,
-    TResult Function(_LeaveCall value)? leaveCall,
-    TResult Function(_ToggleAudio value)? toggleAudio,
-    TResult Function(_ToggleVideo value)? toggleVideo,
-    TResult Function(_SwitchCamera value)? switchCamera,
-    TResult Function(_UpdateCall value)? updateCall,
+    TResult Function(JoinCall value)? joinCall,
+    TResult Function(LeaveCall value)? leaveCall,
+    TResult Function(ToggleAudio value)? toggleAudio,
+    TResult Function(ToggleVideo value)? toggleVideo,
+    TResult Function(SwitchCamera value)? switchCamera,
+    TResult Function(UpdateCall value)? updateCall,
     required TResult orElse(),
   }) {
     if (leaveCall != null) {
@@ -376,8 +376,8 @@ class _$LeaveCallImpl implements _LeaveCall {
   }
 }
 
-abstract class _LeaveCall implements CallEvent {
-  const factory _LeaveCall() = _$LeaveCallImpl;
+abstract class LeaveCall implements CallEvent {
+  const factory LeaveCall() = _$LeaveCallImpl;
 }
 
 /// @nodoc
@@ -398,7 +398,7 @@ class __$$ToggleAudioImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ToggleAudioImpl implements _ToggleAudio {
+class _$ToggleAudioImpl implements ToggleAudio {
   const _$ToggleAudioImpl();
 
   @override
@@ -461,12 +461,12 @@ class _$ToggleAudioImpl implements _ToggleAudio {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_JoinCall value) joinCall,
-    required TResult Function(_LeaveCall value) leaveCall,
-    required TResult Function(_ToggleAudio value) toggleAudio,
-    required TResult Function(_ToggleVideo value) toggleVideo,
-    required TResult Function(_SwitchCamera value) switchCamera,
-    required TResult Function(_UpdateCall value) updateCall,
+    required TResult Function(JoinCall value) joinCall,
+    required TResult Function(LeaveCall value) leaveCall,
+    required TResult Function(ToggleAudio value) toggleAudio,
+    required TResult Function(ToggleVideo value) toggleVideo,
+    required TResult Function(SwitchCamera value) switchCamera,
+    required TResult Function(UpdateCall value) updateCall,
   }) {
     return toggleAudio(this);
   }
@@ -474,12 +474,12 @@ class _$ToggleAudioImpl implements _ToggleAudio {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_JoinCall value)? joinCall,
-    TResult? Function(_LeaveCall value)? leaveCall,
-    TResult? Function(_ToggleAudio value)? toggleAudio,
-    TResult? Function(_ToggleVideo value)? toggleVideo,
-    TResult? Function(_SwitchCamera value)? switchCamera,
-    TResult? Function(_UpdateCall value)? updateCall,
+    TResult? Function(JoinCall value)? joinCall,
+    TResult? Function(LeaveCall value)? leaveCall,
+    TResult? Function(ToggleAudio value)? toggleAudio,
+    TResult? Function(ToggleVideo value)? toggleVideo,
+    TResult? Function(SwitchCamera value)? switchCamera,
+    TResult? Function(UpdateCall value)? updateCall,
   }) {
     return toggleAudio?.call(this);
   }
@@ -487,12 +487,12 @@ class _$ToggleAudioImpl implements _ToggleAudio {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_JoinCall value)? joinCall,
-    TResult Function(_LeaveCall value)? leaveCall,
-    TResult Function(_ToggleAudio value)? toggleAudio,
-    TResult Function(_ToggleVideo value)? toggleVideo,
-    TResult Function(_SwitchCamera value)? switchCamera,
-    TResult Function(_UpdateCall value)? updateCall,
+    TResult Function(JoinCall value)? joinCall,
+    TResult Function(LeaveCall value)? leaveCall,
+    TResult Function(ToggleAudio value)? toggleAudio,
+    TResult Function(ToggleVideo value)? toggleVideo,
+    TResult Function(SwitchCamera value)? switchCamera,
+    TResult Function(UpdateCall value)? updateCall,
     required TResult orElse(),
   }) {
     if (toggleAudio != null) {
@@ -502,8 +502,8 @@ class _$ToggleAudioImpl implements _ToggleAudio {
   }
 }
 
-abstract class _ToggleAudio implements CallEvent {
-  const factory _ToggleAudio() = _$ToggleAudioImpl;
+abstract class ToggleAudio implements CallEvent {
+  const factory ToggleAudio() = _$ToggleAudioImpl;
 }
 
 /// @nodoc
@@ -524,7 +524,7 @@ class __$$ToggleVideoImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ToggleVideoImpl implements _ToggleVideo {
+class _$ToggleVideoImpl implements ToggleVideo {
   const _$ToggleVideoImpl();
 
   @override
@@ -587,12 +587,12 @@ class _$ToggleVideoImpl implements _ToggleVideo {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_JoinCall value) joinCall,
-    required TResult Function(_LeaveCall value) leaveCall,
-    required TResult Function(_ToggleAudio value) toggleAudio,
-    required TResult Function(_ToggleVideo value) toggleVideo,
-    required TResult Function(_SwitchCamera value) switchCamera,
-    required TResult Function(_UpdateCall value) updateCall,
+    required TResult Function(JoinCall value) joinCall,
+    required TResult Function(LeaveCall value) leaveCall,
+    required TResult Function(ToggleAudio value) toggleAudio,
+    required TResult Function(ToggleVideo value) toggleVideo,
+    required TResult Function(SwitchCamera value) switchCamera,
+    required TResult Function(UpdateCall value) updateCall,
   }) {
     return toggleVideo(this);
   }
@@ -600,12 +600,12 @@ class _$ToggleVideoImpl implements _ToggleVideo {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_JoinCall value)? joinCall,
-    TResult? Function(_LeaveCall value)? leaveCall,
-    TResult? Function(_ToggleAudio value)? toggleAudio,
-    TResult? Function(_ToggleVideo value)? toggleVideo,
-    TResult? Function(_SwitchCamera value)? switchCamera,
-    TResult? Function(_UpdateCall value)? updateCall,
+    TResult? Function(JoinCall value)? joinCall,
+    TResult? Function(LeaveCall value)? leaveCall,
+    TResult? Function(ToggleAudio value)? toggleAudio,
+    TResult? Function(ToggleVideo value)? toggleVideo,
+    TResult? Function(SwitchCamera value)? switchCamera,
+    TResult? Function(UpdateCall value)? updateCall,
   }) {
     return toggleVideo?.call(this);
   }
@@ -613,12 +613,12 @@ class _$ToggleVideoImpl implements _ToggleVideo {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_JoinCall value)? joinCall,
-    TResult Function(_LeaveCall value)? leaveCall,
-    TResult Function(_ToggleAudio value)? toggleAudio,
-    TResult Function(_ToggleVideo value)? toggleVideo,
-    TResult Function(_SwitchCamera value)? switchCamera,
-    TResult Function(_UpdateCall value)? updateCall,
+    TResult Function(JoinCall value)? joinCall,
+    TResult Function(LeaveCall value)? leaveCall,
+    TResult Function(ToggleAudio value)? toggleAudio,
+    TResult Function(ToggleVideo value)? toggleVideo,
+    TResult Function(SwitchCamera value)? switchCamera,
+    TResult Function(UpdateCall value)? updateCall,
     required TResult orElse(),
   }) {
     if (toggleVideo != null) {
@@ -628,8 +628,8 @@ class _$ToggleVideoImpl implements _ToggleVideo {
   }
 }
 
-abstract class _ToggleVideo implements CallEvent {
-  const factory _ToggleVideo() = _$ToggleVideoImpl;
+abstract class ToggleVideo implements CallEvent {
+  const factory ToggleVideo() = _$ToggleVideoImpl;
 }
 
 /// @nodoc
@@ -650,7 +650,7 @@ class __$$SwitchCameraImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$SwitchCameraImpl implements _SwitchCamera {
+class _$SwitchCameraImpl implements SwitchCamera {
   const _$SwitchCameraImpl();
 
   @override
@@ -713,12 +713,12 @@ class _$SwitchCameraImpl implements _SwitchCamera {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_JoinCall value) joinCall,
-    required TResult Function(_LeaveCall value) leaveCall,
-    required TResult Function(_ToggleAudio value) toggleAudio,
-    required TResult Function(_ToggleVideo value) toggleVideo,
-    required TResult Function(_SwitchCamera value) switchCamera,
-    required TResult Function(_UpdateCall value) updateCall,
+    required TResult Function(JoinCall value) joinCall,
+    required TResult Function(LeaveCall value) leaveCall,
+    required TResult Function(ToggleAudio value) toggleAudio,
+    required TResult Function(ToggleVideo value) toggleVideo,
+    required TResult Function(SwitchCamera value) switchCamera,
+    required TResult Function(UpdateCall value) updateCall,
   }) {
     return switchCamera(this);
   }
@@ -726,12 +726,12 @@ class _$SwitchCameraImpl implements _SwitchCamera {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_JoinCall value)? joinCall,
-    TResult? Function(_LeaveCall value)? leaveCall,
-    TResult? Function(_ToggleAudio value)? toggleAudio,
-    TResult? Function(_ToggleVideo value)? toggleVideo,
-    TResult? Function(_SwitchCamera value)? switchCamera,
-    TResult? Function(_UpdateCall value)? updateCall,
+    TResult? Function(JoinCall value)? joinCall,
+    TResult? Function(LeaveCall value)? leaveCall,
+    TResult? Function(ToggleAudio value)? toggleAudio,
+    TResult? Function(ToggleVideo value)? toggleVideo,
+    TResult? Function(SwitchCamera value)? switchCamera,
+    TResult? Function(UpdateCall value)? updateCall,
   }) {
     return switchCamera?.call(this);
   }
@@ -739,12 +739,12 @@ class _$SwitchCameraImpl implements _SwitchCamera {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_JoinCall value)? joinCall,
-    TResult Function(_LeaveCall value)? leaveCall,
-    TResult Function(_ToggleAudio value)? toggleAudio,
-    TResult Function(_ToggleVideo value)? toggleVideo,
-    TResult Function(_SwitchCamera value)? switchCamera,
-    TResult Function(_UpdateCall value)? updateCall,
+    TResult Function(JoinCall value)? joinCall,
+    TResult Function(LeaveCall value)? leaveCall,
+    TResult Function(ToggleAudio value)? toggleAudio,
+    TResult Function(ToggleVideo value)? toggleVideo,
+    TResult Function(SwitchCamera value)? switchCamera,
+    TResult Function(UpdateCall value)? updateCall,
     required TResult orElse(),
   }) {
     if (switchCamera != null) {
@@ -754,8 +754,8 @@ class _$SwitchCameraImpl implements _SwitchCamera {
   }
 }
 
-abstract class _SwitchCamera implements CallEvent {
-  const factory _SwitchCamera() = _$SwitchCameraImpl;
+abstract class SwitchCamera implements CallEvent {
+  const factory SwitchCamera() = _$SwitchCameraImpl;
 }
 
 /// @nodoc
@@ -791,7 +791,7 @@ class __$$UpdateCallImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$UpdateCallImpl implements _UpdateCall {
+class _$UpdateCallImpl implements UpdateCall {
   const _$UpdateCallImpl({required this.call});
 
   @override
@@ -865,12 +865,12 @@ class _$UpdateCallImpl implements _UpdateCall {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_JoinCall value) joinCall,
-    required TResult Function(_LeaveCall value) leaveCall,
-    required TResult Function(_ToggleAudio value) toggleAudio,
-    required TResult Function(_ToggleVideo value) toggleVideo,
-    required TResult Function(_SwitchCamera value) switchCamera,
-    required TResult Function(_UpdateCall value) updateCall,
+    required TResult Function(JoinCall value) joinCall,
+    required TResult Function(LeaveCall value) leaveCall,
+    required TResult Function(ToggleAudio value) toggleAudio,
+    required TResult Function(ToggleVideo value) toggleVideo,
+    required TResult Function(SwitchCamera value) switchCamera,
+    required TResult Function(UpdateCall value) updateCall,
   }) {
     return updateCall(this);
   }
@@ -878,12 +878,12 @@ class _$UpdateCallImpl implements _UpdateCall {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_JoinCall value)? joinCall,
-    TResult? Function(_LeaveCall value)? leaveCall,
-    TResult? Function(_ToggleAudio value)? toggleAudio,
-    TResult? Function(_ToggleVideo value)? toggleVideo,
-    TResult? Function(_SwitchCamera value)? switchCamera,
-    TResult? Function(_UpdateCall value)? updateCall,
+    TResult? Function(JoinCall value)? joinCall,
+    TResult? Function(LeaveCall value)? leaveCall,
+    TResult? Function(ToggleAudio value)? toggleAudio,
+    TResult? Function(ToggleVideo value)? toggleVideo,
+    TResult? Function(SwitchCamera value)? switchCamera,
+    TResult? Function(UpdateCall value)? updateCall,
   }) {
     return updateCall?.call(this);
   }
@@ -891,12 +891,12 @@ class _$UpdateCallImpl implements _UpdateCall {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_JoinCall value)? joinCall,
-    TResult Function(_LeaveCall value)? leaveCall,
-    TResult Function(_ToggleAudio value)? toggleAudio,
-    TResult Function(_ToggleVideo value)? toggleVideo,
-    TResult Function(_SwitchCamera value)? switchCamera,
-    TResult Function(_UpdateCall value)? updateCall,
+    TResult Function(JoinCall value)? joinCall,
+    TResult Function(LeaveCall value)? leaveCall,
+    TResult Function(ToggleAudio value)? toggleAudio,
+    TResult Function(ToggleVideo value)? toggleVideo,
+    TResult Function(SwitchCamera value)? switchCamera,
+    TResult Function(UpdateCall value)? updateCall,
     required TResult orElse(),
   }) {
     if (updateCall != null) {
@@ -906,8 +906,8 @@ class _$UpdateCallImpl implements _UpdateCall {
   }
 }
 
-abstract class _UpdateCall implements CallEvent {
-  const factory _UpdateCall({required final Call call}) = _$UpdateCallImpl;
+abstract class UpdateCall implements CallEvent {
+  const factory UpdateCall({required final Call call}) = _$UpdateCallImpl;
 
   Call get call;
   @JsonKey(ignore: true)
@@ -953,29 +953,29 @@ mixin _$CallState {
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Connecting value) connecting,
-    required TResult Function(_Connected value) connected,
-    required TResult Function(_Disconnected value) disconnected,
-    required TResult Function(_Error value) error,
+    required TResult Function(Initial value) initial,
+    required TResult Function(Connecting value) connecting,
+    required TResult Function(Connected value) connected,
+    required TResult Function(Disconnected value) disconnected,
+    required TResult Function(Error value) error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
-    TResult? Function(_Connecting value)? connecting,
-    TResult? Function(_Connected value)? connected,
-    TResult? Function(_Disconnected value)? disconnected,
-    TResult? Function(_Error value)? error,
+    TResult? Function(Initial value)? initial,
+    TResult? Function(Connecting value)? connecting,
+    TResult? Function(Connected value)? connected,
+    TResult? Function(Disconnected value)? disconnected,
+    TResult? Function(Error value)? error,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Connecting value)? connecting,
-    TResult Function(_Connected value)? connected,
-    TResult Function(_Disconnected value)? disconnected,
-    TResult Function(_Error value)? error,
+    TResult Function(Initial value)? initial,
+    TResult Function(Connecting value)? connecting,
+    TResult Function(Connected value)? connected,
+    TResult Function(Disconnected value)? disconnected,
+    TResult Function(Error value)? error,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -1016,7 +1016,7 @@ class __$$InitialImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$InitialImpl implements _Initial {
+class _$InitialImpl implements Initial {
   const _$InitialImpl();
 
   @override
@@ -1082,11 +1082,11 @@ class _$InitialImpl implements _Initial {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Connecting value) connecting,
-    required TResult Function(_Connected value) connected,
-    required TResult Function(_Disconnected value) disconnected,
-    required TResult Function(_Error value) error,
+    required TResult Function(Initial value) initial,
+    required TResult Function(Connecting value) connecting,
+    required TResult Function(Connected value) connected,
+    required TResult Function(Disconnected value) disconnected,
+    required TResult Function(Error value) error,
   }) {
     return initial(this);
   }
@@ -1094,11 +1094,11 @@ class _$InitialImpl implements _Initial {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
-    TResult? Function(_Connecting value)? connecting,
-    TResult? Function(_Connected value)? connected,
-    TResult? Function(_Disconnected value)? disconnected,
-    TResult? Function(_Error value)? error,
+    TResult? Function(Initial value)? initial,
+    TResult? Function(Connecting value)? connecting,
+    TResult? Function(Connected value)? connected,
+    TResult? Function(Disconnected value)? disconnected,
+    TResult? Function(Error value)? error,
   }) {
     return initial?.call(this);
   }
@@ -1106,11 +1106,11 @@ class _$InitialImpl implements _Initial {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Connecting value)? connecting,
-    TResult Function(_Connected value)? connected,
-    TResult Function(_Disconnected value)? disconnected,
-    TResult Function(_Error value)? error,
+    TResult Function(Initial value)? initial,
+    TResult Function(Connecting value)? connecting,
+    TResult Function(Connected value)? connected,
+    TResult Function(Disconnected value)? disconnected,
+    TResult Function(Error value)? error,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -1120,8 +1120,8 @@ class _$InitialImpl implements _Initial {
   }
 }
 
-abstract class _Initial implements CallState {
-  const factory _Initial() = _$InitialImpl;
+abstract class Initial implements CallState {
+  const factory Initial() = _$InitialImpl;
 }
 
 /// @nodoc
@@ -1142,7 +1142,7 @@ class __$$ConnectingImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConnectingImpl implements _Connecting {
+class _$ConnectingImpl implements Connecting {
   const _$ConnectingImpl();
 
   @override
@@ -1208,11 +1208,11 @@ class _$ConnectingImpl implements _Connecting {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Connecting value) connecting,
-    required TResult Function(_Connected value) connected,
-    required TResult Function(_Disconnected value) disconnected,
-    required TResult Function(_Error value) error,
+    required TResult Function(Initial value) initial,
+    required TResult Function(Connecting value) connecting,
+    required TResult Function(Connected value) connected,
+    required TResult Function(Disconnected value) disconnected,
+    required TResult Function(Error value) error,
   }) {
     return connecting(this);
   }
@@ -1220,11 +1220,11 @@ class _$ConnectingImpl implements _Connecting {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
-    TResult? Function(_Connecting value)? connecting,
-    TResult? Function(_Connected value)? connected,
-    TResult? Function(_Disconnected value)? disconnected,
-    TResult? Function(_Error value)? error,
+    TResult? Function(Initial value)? initial,
+    TResult? Function(Connecting value)? connecting,
+    TResult? Function(Connected value)? connected,
+    TResult? Function(Disconnected value)? disconnected,
+    TResult? Function(Error value)? error,
   }) {
     return connecting?.call(this);
   }
@@ -1232,11 +1232,11 @@ class _$ConnectingImpl implements _Connecting {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Connecting value)? connecting,
-    TResult Function(_Connected value)? connected,
-    TResult Function(_Disconnected value)? disconnected,
-    TResult Function(_Error value)? error,
+    TResult Function(Initial value)? initial,
+    TResult Function(Connecting value)? connecting,
+    TResult Function(Connected value)? connected,
+    TResult Function(Disconnected value)? disconnected,
+    TResult Function(Error value)? error,
     required TResult orElse(),
   }) {
     if (connecting != null) {
@@ -1246,8 +1246,8 @@ class _$ConnectingImpl implements _Connecting {
   }
 }
 
-abstract class _Connecting implements CallState {
-  const factory _Connecting() = _$ConnectingImpl;
+abstract class Connecting implements CallState {
+  const factory Connecting() = _$ConnectingImpl;
 }
 
 /// @nodoc
@@ -1296,7 +1296,7 @@ class __$$ConnectedImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ConnectedImpl implements _Connected {
+class _$ConnectedImpl implements Connected {
   const _$ConnectedImpl(
       {required this.call,
       required this.localRenderer,
@@ -1391,11 +1391,11 @@ class _$ConnectedImpl implements _Connected {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Connecting value) connecting,
-    required TResult Function(_Connected value) connected,
-    required TResult Function(_Disconnected value) disconnected,
-    required TResult Function(_Error value) error,
+    required TResult Function(Initial value) initial,
+    required TResult Function(Connecting value) connecting,
+    required TResult Function(Connected value) connected,
+    required TResult Function(Disconnected value) disconnected,
+    required TResult Function(Error value) error,
   }) {
     return connected(this);
   }
@@ -1403,11 +1403,11 @@ class _$ConnectedImpl implements _Connected {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
-    TResult? Function(_Connecting value)? connecting,
-    TResult? Function(_Connected value)? connected,
-    TResult? Function(_Disconnected value)? disconnected,
-    TResult? Function(_Error value)? error,
+    TResult? Function(Initial value)? initial,
+    TResult? Function(Connecting value)? connecting,
+    TResult? Function(Connected value)? connected,
+    TResult? Function(Disconnected value)? disconnected,
+    TResult? Function(Error value)? error,
   }) {
     return connected?.call(this);
   }
@@ -1415,11 +1415,11 @@ class _$ConnectedImpl implements _Connected {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Connecting value)? connecting,
-    TResult Function(_Connected value)? connected,
-    TResult Function(_Disconnected value)? disconnected,
-    TResult Function(_Error value)? error,
+    TResult Function(Initial value)? initial,
+    TResult Function(Connecting value)? connecting,
+    TResult Function(Connected value)? connected,
+    TResult Function(Disconnected value)? disconnected,
+    TResult Function(Error value)? error,
     required TResult orElse(),
   }) {
     if (connected != null) {
@@ -1429,8 +1429,8 @@ class _$ConnectedImpl implements _Connected {
   }
 }
 
-abstract class _Connected implements CallState {
-  const factory _Connected(
+abstract class Connected implements CallState {
+  const factory Connected(
           {required final Call call,
           required final RTCVideoRenderer localRenderer,
           required final Map<String, RTCVideoRenderer> remoteRenderers}) =
@@ -1462,7 +1462,7 @@ class __$$DisconnectedImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$DisconnectedImpl implements _Disconnected {
+class _$DisconnectedImpl implements Disconnected {
   const _$DisconnectedImpl();
 
   @override
@@ -1528,11 +1528,11 @@ class _$DisconnectedImpl implements _Disconnected {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Connecting value) connecting,
-    required TResult Function(_Connected value) connected,
-    required TResult Function(_Disconnected value) disconnected,
-    required TResult Function(_Error value) error,
+    required TResult Function(Initial value) initial,
+    required TResult Function(Connecting value) connecting,
+    required TResult Function(Connected value) connected,
+    required TResult Function(Disconnected value) disconnected,
+    required TResult Function(Error value) error,
   }) {
     return disconnected(this);
   }
@@ -1540,11 +1540,11 @@ class _$DisconnectedImpl implements _Disconnected {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
-    TResult? Function(_Connecting value)? connecting,
-    TResult? Function(_Connected value)? connected,
-    TResult? Function(_Disconnected value)? disconnected,
-    TResult? Function(_Error value)? error,
+    TResult? Function(Initial value)? initial,
+    TResult? Function(Connecting value)? connecting,
+    TResult? Function(Connected value)? connected,
+    TResult? Function(Disconnected value)? disconnected,
+    TResult? Function(Error value)? error,
   }) {
     return disconnected?.call(this);
   }
@@ -1552,11 +1552,11 @@ class _$DisconnectedImpl implements _Disconnected {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Connecting value)? connecting,
-    TResult Function(_Connected value)? connected,
-    TResult Function(_Disconnected value)? disconnected,
-    TResult Function(_Error value)? error,
+    TResult Function(Initial value)? initial,
+    TResult Function(Connecting value)? connecting,
+    TResult Function(Connected value)? connected,
+    TResult Function(Disconnected value)? disconnected,
+    TResult Function(Error value)? error,
     required TResult orElse(),
   }) {
     if (disconnected != null) {
@@ -1566,8 +1566,8 @@ class _$DisconnectedImpl implements _Disconnected {
   }
 }
 
-abstract class _Disconnected implements CallState {
-  const factory _Disconnected() = _$DisconnectedImpl;
+abstract class Disconnected implements CallState {
+  const factory Disconnected() = _$DisconnectedImpl;
 }
 
 /// @nodoc
@@ -1603,7 +1603,7 @@ class __$$ErrorImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$ErrorImpl implements _Error {
+class _$ErrorImpl implements Error {
   const _$ErrorImpl({required this.message});
 
   @override
@@ -1680,11 +1680,11 @@ class _$ErrorImpl implements _Error {
   @override
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(_Initial value) initial,
-    required TResult Function(_Connecting value) connecting,
-    required TResult Function(_Connected value) connected,
-    required TResult Function(_Disconnected value) disconnected,
-    required TResult Function(_Error value) error,
+    required TResult Function(Initial value) initial,
+    required TResult Function(Connecting value) connecting,
+    required TResult Function(Connected value) connected,
+    required TResult Function(Disconnected value) disconnected,
+    required TResult Function(Error value) error,
   }) {
     return error(this);
   }
@@ -1692,11 +1692,11 @@ class _$ErrorImpl implements _Error {
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(_Initial value)? initial,
-    TResult? Function(_Connecting value)? connecting,
-    TResult? Function(_Connected value)? connected,
-    TResult? Function(_Disconnected value)? disconnected,
-    TResult? Function(_Error value)? error,
+    TResult? Function(Initial value)? initial,
+    TResult? Function(Connecting value)? connecting,
+    TResult? Function(Connected value)? connected,
+    TResult? Function(Disconnected value)? disconnected,
+    TResult? Function(Error value)? error,
   }) {
     return error?.call(this);
   }
@@ -1704,11 +1704,11 @@ class _$ErrorImpl implements _Error {
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(_Initial value)? initial,
-    TResult Function(_Connecting value)? connecting,
-    TResult Function(_Connected value)? connected,
-    TResult Function(_Disconnected value)? disconnected,
-    TResult Function(_Error value)? error,
+    TResult Function(Initial value)? initial,
+    TResult Function(Connecting value)? connecting,
+    TResult Function(Connected value)? connected,
+    TResult Function(Disconnected value)? disconnected,
+    TResult Function(Error value)? error,
     required TResult orElse(),
   }) {
     if (error != null) {
@@ -1718,8 +1718,8 @@ class _$ErrorImpl implements _Error {
   }
 }
 
-abstract class _Error implements CallState {
-  const factory _Error({required final String message}) = _$ErrorImpl;
+abstract class Error implements CallState {
+  const factory Error({required final String message}) = _$ErrorImpl;
 
   String get message;
   @JsonKey(ignore: true)

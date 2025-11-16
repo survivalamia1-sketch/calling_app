@@ -19,6 +19,7 @@ const (
 type Room struct {
 	ID               uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	HostID           uuid.UUID  `gorm:"type:uuid;not null;index" json:"host_id"`
+	Code             string     `gorm:"size:12;uniqueIndex;not null" json:"code"` // Unique shareable code
 	Name             string     `gorm:"size:255" json:"name"`
 	Description      string     `json:"description"`
 	Status           RoomStatus `gorm:"default:'waiting'" json:"status"`

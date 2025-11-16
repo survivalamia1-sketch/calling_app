@@ -49,6 +49,9 @@ class CallRepositoryImpl implements CallRepository {
   @override
   Future<Either<Failure, Call>> joinCall(String roomId) async {
     try {
+      // Ensure WebRTC is initialized first
+      await webrtcService.initialize();
+
       // Get user ID from cached user data
       final userDataJson = await storage.read(key: AppConstants.userDataKey);
       if (userDataJson == null) {

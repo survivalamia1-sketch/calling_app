@@ -3,6 +3,7 @@ package rooms
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,6 +31,29 @@ type CreateRoomInput struct {
 type JoinRoomInput struct {
 	Password string `json:"password"`
 	Name     string `json:"name"` // For guest users
+}
+
+// generateRoomCode generates a unique 9-digit room code
+func (s *Service) generateRoomCode() string {
+	db := database.GetDB()
+
+	for {
+		// Generate 9-digit code (format: XXX-XXX-XXX)
+		code := fmt.Sprintf("%03d-%03d-%03d",
+			rand.Intn(1000),
+			rand.Intn(1000),
+			rand.Intn(1000),
+		)
+
+		// Check if code already exists
+		var count int64
+		db.Model(&models.Room{}).Where("code = ?", code).Count(&count)
+
+		if count == 0 {
+			return code
+		}
+		// If code exists, loop and try again
+	}
 }
 
 // CreateRoom creates a new meeting room
@@ -60,6 +84,7 @@ func (s *Service) CreateRoom(hostID uuid.UUID, input CreateRoomInput) (*models.R
 	// Create room
 	room := models.Room{
 		HostID:           hostID,
+		Code:             s.generateRoomCode(),
 		Name:             input.Name,
 		Description:      input.Description,
 		Password:         input.Password,
@@ -92,6 +117,21 @@ func (s *Service) GetRoom(roomID uuid.UUID) (*models.Room, error) {
 	if err := db.Preload("Host").Preload("Participants.User").First(&room, roomID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("room not found")
+		}
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	return &room, nil
+}
+
+// GetRoomByCode gets a room by its unique code
+func (s *Service) GetRoomByCode(code string) (*models.Room, error) {
+	db := database.GetDB()
+
+	var room models.Room
+	if err := db.Where("code = ?", code).Preload("Host").Preload("Participants.User").First(&room).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("room not found with this code")
 		}
 		return nil, fmt.Errorf("database error: %w", err)
 	}

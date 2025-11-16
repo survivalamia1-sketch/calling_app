@@ -5,22 +5,26 @@ class User extends Equatable {
   final String email;
   final String firstName;
   final String lastName;
+  final String? avatar;
   final bool isActive;
   final bool isVerified;
   final String planType;
   final DateTime createdAt;
   final DateTime? emailVerifiedAt;
+  final DateTime? lastLoginAt;
 
   const User({
     required this.id,
     required this.email,
     required this.firstName,
     required this.lastName,
+    this.avatar,
     required this.isActive,
     required this.isVerified,
     required this.planType,
     required this.createdAt,
     this.emailVerifiedAt,
+    this.lastLoginAt,
   });
 
   String get fullName => '$firstName $lastName'.trim();
@@ -35,10 +39,12 @@ class User extends Equatable {
         email,
         firstName,
         lastName,
+        avatar,
         isActive,
         isVerified,
         planType,
         createdAt,
         emailVerifiedAt,
+        lastLoginAt,
       ];
 }

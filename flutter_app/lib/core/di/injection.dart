@@ -15,21 +15,37 @@ import '../../features/auth/domain/usecases/logout.dart';
 import '../../features/auth/domain/usecases/register.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/call/data/repositories/call_repository_impl.dart';
+import '../../features/call/data/repositories/chat_repository_impl.dart';
+import '../../features/call/data/services/meeting_connection_service_impl.dart';
+import '../../features/call/data/services/meeting_media_service_impl.dart';
 import '../../features/call/data/services/signaling_service.dart';
 import '../../features/call/data/services/webrtc_service.dart';
 import '../../features/call/domain/repositories/call_repository.dart';
-import '../../features/call/domain/usecases/join_call.dart';
-import '../../features/call/domain/usecases/leave_call.dart';
-import '../../features/call/domain/usecases/switch_camera.dart';
-import '../../features/call/domain/usecases/toggle_audio.dart';
-import '../../features/call/domain/usecases/toggle_video.dart';
+import '../../features/call/domain/repositories/chat_repository.dart';
+import '../../features/call/domain/repositories/meeting_connection_service.dart';
+import '../../features/call/domain/repositories/meeting_media_service.dart';
+import '../../features/call/domain/usecases/join_call.dart'
+    as join_call_usecase;
+import '../../features/call/domain/usecases/leave_call.dart'
+    as leave_call_usecase;
+import '../../features/call/domain/usecases/switch_camera.dart'
+    as switch_camera_usecase;
+import '../../features/call/domain/usecases/toggle_audio.dart'
+    as toggle_audio_usecase;
+import '../../features/call/domain/usecases/toggle_video.dart'
+    as toggle_video_usecase;
 import '../../features/call/presentation/bloc/call_bloc.dart';
+import '../../features/call/presentation/bloc/in_meeting_bloc.dart';
 import '../../features/home/data/datasources/dashboard_remote_data_source.dart';
+import '../../features/home/data/datasources/notifications_remote_data_source.dart';
 import '../../features/home/data/repositories/dashboard_repository_impl.dart';
+import '../../features/home/data/repositories/notifications_repository_impl.dart';
 import '../../features/home/domain/repositories/dashboard_repository.dart';
+import '../../features/home/domain/repositories/notifications_repository.dart';
 import '../../features/home/domain/usecases/get_dashboard_stats.dart';
 import '../../features/home/domain/usecases/get_upcoming_meetings.dart';
 import '../../features/home/presentation/bloc/dashboard_bloc.dart';
+import '../../features/home/presentation/bloc/notifications_bloc.dart';
 import '../../features/meetings/data/datasources/meetings_remote_data_source.dart';
 import '../../features/meetings/data/repositories/meetings_repository_impl.dart';
 import '../../features/meetings/domain/repositories/meetings_repository.dart';
@@ -37,6 +53,7 @@ import '../../features/meetings/domain/usecases/create_meeting.dart';
 import '../../features/meetings/domain/usecases/get_meetings.dart';
 import '../../features/meetings/domain/usecases/join_meeting.dart';
 import '../../features/meetings/presentation/bloc/meetings_bloc.dart';
+import '../../features/meetings/presentation/bloc/scheduled_meetings_bloc.dart';
 import '../../features/profile/data/datasources/profile_remote_data_source.dart';
 import '../../features/profile/data/repositories/profile_repository_impl.dart';
 import '../../features/profile/domain/repositories/profile_repository.dart';
@@ -230,6 +247,13 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  // Scheduled Meetings Bloc
+  getIt.registerFactory(
+    () => ScheduledMeetingsBloc(
+      repository: getIt(),
+    ),
+  );
+
   // ===========================
   // Subscriptions Feature
   // ===========================
@@ -269,10 +293,19 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<DashboardRemoteDataSource>(
     () => DashboardRemoteDataSourceImpl(client: getIt()),
   );
+  getIt.registerLazySingleton<NotificationsRemoteDataSource>(
+    () => NotificationsRemoteDataSourceImpl(dio: getIt()),
+  );
 
   // Repository
   getIt.registerLazySingleton<DashboardRepository>(
     () => DashboardRepositoryImpl(
+      remoteDataSource: getIt(),
+      networkInfo: getIt(),
+    ),
+  );
+  getIt.registerLazySingleton<NotificationsRepository>(
+    () => NotificationsRepositoryImpl(
       remoteDataSource: getIt(),
       networkInfo: getIt(),
     ),
@@ -287,6 +320,11 @@ Future<void> configureDependencies() async {
     () => DashboardBloc(
       getDashboardStats: getIt(),
       getUpcomingMeetings: getIt(),
+    ),
+  );
+  getIt.registerFactory(
+    () => NotificationsBloc(
+      repository: getIt(),
     ),
   );
 
@@ -400,22 +438,47 @@ Future<void> configureDependencies() async {
   );
 
   // Use cases
-  getIt.registerLazySingleton(() => JoinCall(getIt()));
-  getIt.registerLazySingleton(() => LeaveCall(getIt()));
-  getIt.registerLazySingleton(() => ToggleAudio(getIt()));
-  getIt.registerLazySingleton(() => ToggleVideo(getIt()));
-  getIt.registerLazySingleton(() => SwitchCamera(getIt()));
+  getIt.registerLazySingleton(() => join_call_usecase.JoinCall(getIt<CallRepository>()));
+  getIt.registerLazySingleton(() => leave_call_usecase.LeaveCall(getIt<CallRepository>()));
+  getIt.registerLazySingleton(() => toggle_audio_usecase.ToggleAudio(getIt<CallRepository>()));
+  getIt.registerLazySingleton(() => toggle_video_usecase.ToggleVideo(getIt<CallRepository>()));
+  getIt.registerLazySingleton(() => switch_camera_usecase.SwitchCamera(getIt<CallRepository>()));
 
   // Bloc
   getIt.registerFactory(
     () => CallBloc(
-      joinCall: getIt(),
-      leaveCall: getIt(),
-      toggleAudio: getIt(),
-      toggleVideo: getIt(),
-      switchCamera: getIt(),
       repository: getIt(),
       webrtcService: getIt(),
+    ),
+  );
+
+  // ===========================
+  // In-Meeting Feature (Real Implementations)
+  // ===========================
+
+  // Register real implementations using WebRTC and WebSocket
+  getIt.registerLazySingleton<MeetingMediaService>(
+    () => MeetingMediaServiceImpl(webrtcService: getIt()),
+  );
+
+  getIt.registerLazySingleton<MeetingConnectionService>(
+    () => MeetingConnectionServiceImpl(
+      webrtcService: getIt(),
+      signalingService: getIt(),
+      chatRepository: getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(signalingService: getIt()),
+  );
+
+  // Register InMeetingBloc as factory (new instance for each meeting)
+  getIt.registerFactory(
+    () => InMeetingBloc(
+      connectionService: getIt<MeetingConnectionService>(),
+      mediaService: getIt<MeetingMediaService>(),
+      chatRepository: getIt<ChatRepository>(),
     ),
   );
 }

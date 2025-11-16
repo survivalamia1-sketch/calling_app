@@ -10,6 +10,7 @@ import '../bloc/dashboard_bloc.dart';
 import '../widgets/quick_action_card.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/upcoming_meetings_card.dart';
+import 'notifications_page.dart';
 
 class HomeDashboardPage extends StatelessWidget {
   const HomeDashboardPage({super.key});
@@ -34,7 +35,11 @@ class HomeDashboardPage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.notifications_outlined),
               onPressed: () {
-                // TODO: Navigate to notifications
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsPage(),
+                  ),
+                );
               },
             ),
             IconButton(
@@ -57,6 +62,8 @@ class HomeDashboardPage extends StatelessWidget {
             builder: (context, authState) {
               return authState.maybeWhen(
                 authenticated: (user) =>
+                    _buildDashboard(context, user.fullName),
+                emailNotVerified: (user) =>
                     _buildDashboard(context, user.fullName),
                 orElse: () => const Center(
                   child: CircularProgressIndicator(),
@@ -275,10 +282,10 @@ class HomeDashboardPage extends StatelessWidget {
                             child: QuickActionCard(
                               icon: Icons.calendar_today,
                               title: 'Schedule',
-                              subtitle: 'Plan a future meeting',
+                              subtitle: 'Manage scheduled meetings',
                               color: Colors.green,
                               onTap: () {
-                                context.push('/meetings/create?scheduled=true');
+                                context.push('/meetings/schedule');
                               },
                             ),
                           ),
@@ -334,10 +341,10 @@ class HomeDashboardPage extends StatelessWidget {
                           QuickActionCard(
                             icon: Icons.calendar_today,
                             title: 'Schedule',
-                            subtitle: 'Plan future',
+                            subtitle: 'Manage meetings',
                             color: Colors.green,
                             onTap: () {
-                              context.push('/meetings/create?scheduled=true');
+                              context.push('/meetings/schedule');
                             },
                           ),
                           QuickActionCard(
