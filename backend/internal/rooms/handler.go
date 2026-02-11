@@ -145,6 +145,35 @@ func (h *Handler) GetUserRooms(c *gin.Context) {
 	c.JSON(http.StatusOK, rooms)
 }
 
+// GetPersonalRoom godoc
+// @Summary Get personal room
+// @Description Get or create the authenticated user's personal meeting room
+// @Tags rooms
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} models.Room
+// @Failure 401 {object} map[string]interface{}
+// @Router /rooms/personal [get]
+func (h *Handler) GetPersonalRoom(c *gin.Context) {
+	userID, exists := middleware.GetUserID(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	room, err := h.service.GetOrCreatePersonalRoom(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, room)
+}
+
 // JoinRoom godoc
 // @Summary Join room
 // @Description Join a meeting room
