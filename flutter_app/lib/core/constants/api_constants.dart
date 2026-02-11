@@ -33,6 +33,7 @@ class ApiConstants {
   static String roomStatus(String id) => '/rooms/$id/status';
   static String roomLeave(String id) => '/rooms/$id/leave';
   static String roomEnd(String id) => '/rooms/$id/end';
+  static const String roomPersonal = '/rooms/personal';
 
   static const String subscriptionsPlans = '/subscriptions/plans';
   static const String subscriptionsCheckout = '/subscriptions/checkout';

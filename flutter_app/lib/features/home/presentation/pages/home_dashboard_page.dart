@@ -1,8 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:calling_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/di/injection.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
@@ -74,6 +76,28 @@ class HomeDashboardPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+
+
+  Future<void> _startPersonalMeeting(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      final response = await getIt<Dio>().get(ApiConstants.roomPersonal);
+      final data = response.data as Map<String, dynamic>;
+      final roomId = data['id'] as String?;
+
+      if (roomId == null || roomId.isEmpty) {
+        throw Exception('Invalid room response');
+      }
+
+      context.push('/call/preview/$roomId?name=Personal%20Meeting%20Room');
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Unable to start personal meeting')),
+      );
+    }
   }
 
   Widget _buildDashboard(BuildContext context, String userName) {
@@ -273,7 +297,7 @@ class HomeDashboardPage extends StatelessWidget {
                               subtitle: 'Begin an instant meeting',
                               color: Colors.blue,
                               onTap: () {
-                                context.push('/meetings/create');
+                                _startPersonalMeeting(context);
                               },
                             ),
                           ),
@@ -335,7 +359,7 @@ class HomeDashboardPage extends StatelessWidget {
                             subtitle: 'Begin instant',
                             color: Colors.blue,
                             onTap: () {
-                              context.push('/meetings/create');
+                              _startPersonalMeeting(context);
                             },
                           ),
                           QuickActionCard(

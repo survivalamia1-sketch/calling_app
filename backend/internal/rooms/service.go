@@ -33,6 +33,32 @@ type JoinRoomInput struct {
 	Name     string `json:"name"` // For guest users
 }
 
+// GetOrCreatePersonalRoom returns the host's personal meeting room.
+// If the room does not exist yet, it creates one with Zoom-style defaults.
+func (s *Service) GetOrCreatePersonalRoom(hostID uuid.UUID) (*models.Room, error) {
+	db := database.GetDB()
+
+	var room models.Room
+	err := db.Where("host_id = ? AND name = ?", hostID, "Personal Meeting Room").First(&room).Error
+	if err == nil {
+		db.Preload("Host").First(&room, room.ID)
+		return &room, nil
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("database error: %w", err)
+	}
+
+	input := CreateRoomInput{
+		Name:            "Personal Meeting Room",
+		Description:     "Always-available personal room for instant meetings",
+		HasWaitingRoom:  true,
+		MaxParticipants: 10,
+	}
+
+	return s.CreateRoom(hostID, input)
+}
+
 // generateRoomCode generates a unique 9-digit room code
 func (s *Service) generateRoomCode() string {
 	db := database.GetDB()

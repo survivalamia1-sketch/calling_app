@@ -151,6 +151,7 @@ func main() {
 			roomProtected.Use(middleware.AuthMiddleware(cfg))
 			{
 				roomProtected.GET("", roomsHandler.GetUserRooms)
+				roomProtected.GET("/personal", roomsHandler.GetPersonalRoom)
 				roomProtected.POST("", roomsHandler.CreateRoom)
 				roomProtected.POST("/:id/leave", roomsHandler.LeaveRoom)
 				roomProtected.POST("/:id/end", roomsHandler.EndRoom)
